@@ -298,6 +298,10 @@
     <OutDir>$(ProjectDir)Build\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)Build\$(Configuration)\Obj\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)Build\$(Configuration)</OutDir>
+    <IntDir>$(ProjectDir)Build\$(Configuration)\Obj\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
