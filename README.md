@@ -4,6 +4,7 @@ Capibara Engine is a project developed in the subject 3D Motors for the Game Des
 ## Team
 #### Arnau Bonada: https://github.com/arnaubonada
 #### Albert Pou: https://github.com/Hydeon-git
+#### Pol Pallares: https://github.com/Zeta115
 This project was forked from https://github.com/solidajenjo/Engine3D
 
 ## Instructions
