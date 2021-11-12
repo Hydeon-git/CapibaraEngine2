@@ -20,6 +20,10 @@
 #include "Assimp/include/postprocess.h"
 #include "Assimp/include/mesh.h"
 
+#include "DevIL/include/il.h"
+#include "DevIL/include/ilu.h"
+#include "DevIL/include/ilut.h"
+
 
 ModuleImport::ModuleImport(Application* app, bool start_enabled) : Module(app, start_enabled) {}
 
@@ -161,6 +165,22 @@ bool ModuleImport::LoadGeometry(const char* path) {
 	RELEASE_ARRAY(buffer);
 
 	return true;
+}
+
+bool ModuleImport::LoadTexture(const char* path)
+{
+	ILuint size;
+	ILubyte* data;
+	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
+	size = ilSaveL(IL_DDS, nullptr, 0); // Get the size of the data buffer
+	if (size > 0) {
+		data = new ILubyte[size]; // allocate data buffer
+		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
+		{
+			*fileBuffer = (char*)data;
+		}
+		RELEASE_ARRAY(data);
+	}
 }
 
 void ModuleImport::FindNodeName(const aiScene* scene, const size_t i, std::string& name)
