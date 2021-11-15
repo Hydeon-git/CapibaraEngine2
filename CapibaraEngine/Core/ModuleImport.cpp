@@ -6,8 +6,8 @@
 #include "ModuleTextures.h"
 #include "ModuleFileSystem.h"
 #include "ModuleScene.h"
-#include "ComponentMesh.h"
 #include "ComponentMaterial.h"
+#include "ComponentMesh.h"
 #include "GameObject.h"
 
 #include <vector>
@@ -167,19 +167,56 @@ bool ModuleImport::LoadGeometry(const char* path) {
 	return true;
 }
 
-bool ModuleImport::LoadTexture(const char* path)
+void ModuleImport::Load(std::string path)
 {
-	ILuint size;
-	ILubyte* data;
-	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
-	size = ilSaveL(IL_DDS, nullptr, 0); // Get the size of the data buffer
-	if (size > 0) {
-		data = new ILubyte[size]; // allocate data buffer
-		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
+	if (App->fileSystem->Exists(path))
+	{
+		LOG("Library Existe");
+
+	}
+	else
+	{
+		LOG("Library No Existe");
+
+		Save(path);
+		App->textures->Load(path);
+	}
+}
+
+bool ModuleImport::Save(std::string path)
+{
+	LOG("Loading texture -> %s", path.c_str());
+
+	ILuint imageId;
+
+	char* data;
+	uint bytes = App->fileSystem->Load(path.c_str(), &data);
+
+	if (bytes != 0)
+	{
+		if (ilLoadL(IL_TYPE_UNKNOWN, data, bytes))
 		{
-			*fileBuffer = (char*)data;
+			ILuint size;
+			ILubyte* data;
+			ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
+			size = ilSaveL(IL_DDS, nullptr, 0); // Get the size of the data buffer
+			if (size > 0) 
+			{
+				data = new ILubyte[size]; // Allocate data buffer
+				if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
+				{
+					App->fileSystem->Save("Library/Test.dds", data, size);
+					return true;
+				}				
+				RELEASE_ARRAY(data);
+			}			
+			delete[] data;
 		}
-		RELEASE_ARRAY(data);
+		delete[] data;
+	}
+	else
+	{
+		return false;
 	}
 }
 

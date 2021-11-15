@@ -1,6 +1,5 @@
 #pragma once
 #include "Module.h"
-
 #include <string>
 
 class ComponentMesh;
@@ -17,7 +16,10 @@ public:
 	bool CleanUp() override;
 
 	bool LoadGeometry(const char* path);
-	bool LoadTexture(const char* path);
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
+
+	// Custom File Format DDS
+	bool Save(std::string path);
+	void Load(std::string path);
 };
