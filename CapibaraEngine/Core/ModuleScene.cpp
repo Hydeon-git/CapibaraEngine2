@@ -6,7 +6,9 @@
 #include "ModuleImport.h"
 #include "ModuleTextures.h"
 #include "ModuleCamera3D.h"
+#include "ModuleEditor.h"
 #include "Component.h"
+#include "ComponentTransform.h"
 #include <stack>
 #include <queue>
 
@@ -71,6 +73,28 @@ update_status ModuleScene::Update(float dt)
 			S.push(child);
 		}
 	}
+	glDisable(GL_DEPTH_TEST);
+
+	if (App->editor->gameobjectSelected)
+	{
+		ComponentTransform* transform = App->editor->gameobjectSelected->GetComponent<ComponentTransform>();
+		float3 pos = transform->GetPosition();
+		glLineWidth(10.f);
+		glBegin(GL_LINES);
+		glColor3f(1.f, 0.f, 0.f);
+		glVertex3f(pos.x, pos.y, pos.z);
+		glVertex3f(pos.x + transform->Right().x, pos.y + transform->Right().y, pos.z + transform->Right().z);
+		glColor3f(0.f, 0.f, 1.f);
+		glVertex3f(pos.x, pos.y, pos.z);
+		glVertex3f(pos.x + transform->Front().x, pos.y + transform->Front().y, pos.z + transform->Front().z);
+		glColor3f(0.f, 1.f, 0.f);
+		glVertex3f(pos.x, pos.y, pos.z);
+		glVertex3f(pos.x + transform->Up().x, pos.y + transform->Up().y, pos.z + transform->Up().z);
+		glEnd();
+		glLineWidth(1.f);
+	}
+
+	glEnable(GL_DEPTH_TEST);
 
 	return UPDATE_CONTINUE;
 }
