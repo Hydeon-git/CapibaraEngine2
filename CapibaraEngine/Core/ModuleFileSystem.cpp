@@ -24,7 +24,6 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	AddPath("./Assets");
 	AddPath("./Assets/Textures");
 	AddPath("./Assets/Models");
-	AddPath("./Library/Models");
 	AddPath("./Library/Meshes");
 	AddPath("./Library/Materials");
 }

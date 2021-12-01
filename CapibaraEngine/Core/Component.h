@@ -21,8 +21,8 @@ public:
 		return true;
 	}
 
-	virtual bool Enable() { return active = true; };
-	virtual bool Disable() { return active = false; };
+	virtual bool Enable() { return active == true; };
+	virtual bool Disable() { return active == false; };
 	virtual void OnGui() { }
 
 public:
