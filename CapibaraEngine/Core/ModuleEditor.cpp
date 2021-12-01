@@ -13,7 +13,6 @@
 #include "ModuleTextures.h"
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
-#include "ComponentTransform.h"
 
 //Tools
 
@@ -242,12 +241,10 @@ void ModuleEditor::DrawGrid()
 
 void ModuleEditor::About_Window() {
 
-    ImGui::Begin("About Capibara Engine", &showAboutWindow);
+    ImGui::Begin("About 3D Engine", &showAboutWindow);
 
     ImGui::Separator();
-    ImGui::Text("Capibara Engine\n");
-    ImGui::Text("\nDeveloped for Videogame Engines Class in CITM-UPC\n");
-    ImGui::Text("\nBy Albert Pou, Arnau Bonada and Pol Pallares\n");
+    ImGui::Text("3D Engine\n");
     ImGui::Separator();
 
     ImGui::Text("3rd Party Libraries used: ");
@@ -265,9 +262,8 @@ void ModuleEditor::About_Window() {
     ImGui::Separator();
 
     ImGui::Text("MIT License\n\n");
-    ImGui::Text("Copyright (c) 2021 CapibaraEngine\n\n");
     ImGui::Text("Permission is hereby granted, free of charge, to any person obtaining a copy\n\nof this software and associated documentation files (the 'Software'), to deal\n");
-    ImGui::Text("in the Software without restriction, including without limitation the rights\n\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n");
+    ImGui::Text("in the Software without restriction, including without limitation the rights\n\nto use, copy, modify, merge, publish, distribute, sublicense, and /or sell\n");
     ImGui::Text("copies of the Software, and to permit persons to whom the Software is\n\nfurnished to do so, subject to the following conditions : \n");
     ImGui::Text("\n");
     ImGui::Text("The above copyright notice and this permission notice shall be included in all\n\ncopies or substantial portions of the Software.\n");
@@ -408,15 +404,6 @@ void ModuleEditor::MenuBar() {
 
         /* ---- HELP ----*/
         if (ImGui::BeginMenu("Help")) {
-            if (ImGui::MenuItem("Documentation"))
-                App->RequestBrowser("https://github.com/Hydeon-git/CapibaraEngine2");
-
-            if (ImGui::MenuItem("Download latest"))
-                App->RequestBrowser("https://github.com/Hydeon-git/CapibaraEngine2/releases");
-
-            if (ImGui::MenuItem("Report a bug"))
-                App->RequestBrowser("https://github.com/Hydeon-git/CapibaraEngine2/issues");
-
             if (ImGui::MenuItem("About")) 
                 showAboutWindow = !showAboutWindow;
             ImGui::EndMenu();
@@ -497,12 +484,12 @@ void ModuleEditor::UpdateWindowStatus() {
         ImGui::Begin("Hierarchy", &showHierarchyWindow);
 
         //Just cleaning gameObjects(not textures,buffers...)
-        /*if (ImGui::Button("Clear", { 60,20 })) 
+        if (ImGui::Button("Clear", { 60,20 })) 
         {
             App->editor->gameobjectSelected = nullptr;
             App->scene->CleanUp(); //Clean GameObjects 
         }
-        ImGui::SameLine();*/
+        ImGui::SameLine();
         if (ImGui::Button("New", { 60,20 }))
         {
             App->scene->CreateGameObject();

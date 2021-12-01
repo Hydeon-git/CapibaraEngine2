@@ -22,10 +22,6 @@ public:
 	inline float3 GetRotation() const { return rotationEuler; };
 	inline float3 GetScale() const { return scale; };
 
-	inline const float3& Right() const { return right; }
-	inline const float3& Up() const { return up; }
-	inline const float3& Front() const { return front; }
-
 	void NewAttachment();
 	void OnParentMoved();
 
@@ -43,7 +39,4 @@ private:
 	float3 rotationEuler;
 	float3 scale;
 
-	float3 front = float3::unitZ;
-	float3 up = float3::unitY;
-	float3 right = float3::unitX;
 };
