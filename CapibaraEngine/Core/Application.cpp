@@ -239,6 +239,11 @@ void Application::AddModule(Module* mod)
 	modules.push_back(mod);
 }
 
+void Application::RequestBrowser(const std::string& website)
+{
+	ShellExecuteA(NULL, "open", website.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+
 void Application::DrawFPSDiagram() {
 
 	ImGui::InputText("App Name", TITLE, 20);

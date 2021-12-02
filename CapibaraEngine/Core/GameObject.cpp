@@ -4,18 +4,22 @@
 #include "ModuleFileSystem.h"
 #include "ComponentTransform.h"
 #include "ImGui/imgui.h"
+#include "Algorithm/Random/LCG.h"
 
 GameObject::GameObject() {
 
 	name = name + ("GameObject");
 	parent = nullptr;
 
+	LCG num;
+	UUID = num.Int();
+
 	transform = CreateComponent<ComponentTransform>();
 
 	active = true;
 }
 
-GameObject::GameObject(const std::string name) : name(name) 
+GameObject::GameObject(const std::string name, const int UUID) : name(name), UUID(UUID)
 {
 	transform = CreateComponent<ComponentTransform>();
 

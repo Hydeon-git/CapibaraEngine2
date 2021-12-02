@@ -11,7 +11,7 @@ class GameObject {
 public:
 
 	GameObject();
-	GameObject(const std::string name);
+	GameObject(const std::string name, const int UUID);
 
 	~GameObject();
 
@@ -51,5 +51,6 @@ public:
 	bool active = true;
 	bool isSelected = false;
 
+	int UUID;
 };
 

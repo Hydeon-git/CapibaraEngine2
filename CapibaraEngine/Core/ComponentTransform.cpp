@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Application.h"
 #include "ModuleScene.h"
+#include "Math/TransformOps.h"
 #include "glew.h"
 #include "ImGui/imgui.h"
 
@@ -20,6 +21,9 @@ bool ComponentTransform::Update(float dt) {
 	if (isDirty)
 	{
 		transformMatrixLocal = float4x4::FromTRS(position, rotation, scale);
+		right = transformMatrixLocal.Col3(0).Normalized();
+		up = transformMatrixLocal.Col3(1).Normalized();
+		front = transformMatrixLocal.Col3(2).Normalized();
 		RecomputeGlobalMatrix();
 		owner->PropagateTransform();
 		isDirty = false;
@@ -63,7 +67,8 @@ void ComponentTransform::SetPosition(const float3& newPosition)
 
 void ComponentTransform::SetRotation(const float3& newRotation)
 {
-	rotation = Quat::FromEulerXYZ(newRotation.x, newRotation.y, newRotation.z);
+	Quat rotationDelta = Quat::FromEulerXYZ(newRotation.x - rotationEuler.x, newRotation.y - rotationEuler.y, newRotation.z - rotationEuler.z);
+	rotation = rotation * rotationDelta;
 	rotationEuler = newRotation;
 	isDirty = true;
 }

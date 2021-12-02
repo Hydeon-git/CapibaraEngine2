@@ -2,6 +2,7 @@
 #define _APPLICATION_
 
 #include <vector>
+#include <string>
 
 #include "Globals.h"
 #include "Timer.h"
@@ -54,6 +55,8 @@ public:
 	void AddModule(Module* mod);
 	void PrepareUpdate();
 	void FinishUpdate();
+
+	void RequestBrowser(const std::string& website);
 
 	void OnGui();
 
