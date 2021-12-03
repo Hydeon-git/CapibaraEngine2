@@ -38,7 +38,8 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     showInspectorWindow = true;
     showGameWindow = true;
     showSceneWindow = true;
-    showTextures = true;
+    showTexturesWindow = true;
+    showAssetsWindow = true;
 
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
@@ -104,6 +105,9 @@ update_status ModuleEditor::Update(float dt)
         MenuBar();
         ImGui::End();
     }
+
+    if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
+        gameobjectSelected->parent->RemoveChild(gameobjectSelected);
 
     //Update status of each window and shows ImGui elements
     UpdateWindowStatus();
@@ -400,7 +404,9 @@ void ModuleEditor::MenuBar() {
             if (ImGui::MenuItem("Console")) 
                 showConsoleWindow = !showConsoleWindow;
             if (ImGui::MenuItem("Textures")) 
-                showTextures = !showTextures;
+                showTexturesWindow = !showTexturesWindow;
+            if (ImGui::MenuItem("Assets")) 
+                showAssetsWindow = !showAssetsWindow;
 
             ImGui::Separator();
             if (ImGui::MenuItem("Configuration")) 
@@ -449,9 +455,11 @@ void ModuleEditor::UpdateWindowStatus() {
         ImGui::End();
 
     }
-    if (showTextures)
+
+    //Textures
+    if (showTexturesWindow)
     {
-        ImGui::Begin("Textures", &showTextures);
+        ImGui::Begin("Textures", &showTexturesWindow);
         for (auto& t : App->textures->textures)
         {
             ImGui::Image((ImTextureID)t.second.id, ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
@@ -489,6 +497,17 @@ void ModuleEditor::UpdateWindowStatus() {
         //Only shows info if any gameobject selected
         if (gameobjectSelected != nullptr) 
             InspectorGameObject(); 
+
+        ImGui::End();
+
+    }
+    
+    //Assets
+    if (showAssetsWindow) {
+
+        ImGui::Begin("Assets", &showAssetsWindow);
+
+
 
         ImGui::End();
 
