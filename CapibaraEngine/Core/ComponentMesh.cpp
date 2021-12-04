@@ -174,11 +174,13 @@ bool ComponentMesh::Update(float dt)
 
 	//--Enable States--//
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	//-- Buffers--//
-	glBindBuffer(GL_ARRAY_BUFFER, this->textureBufferId);
-	glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+	if (this->textureBufferId)
+	{
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, this->textureBufferId);
+		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
@@ -199,12 +201,16 @@ bool ComponentMesh::Update(float dt)
 	//-- UnBind Buffers--//
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_TEXTURE_COORD_ARRAY, 0);
+	if (this->textureBufferId)
+	{
+		glBindBuffer(GL_TEXTURE_COORD_ARRAY, 0);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//--Disables States--//
 	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	
 	App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

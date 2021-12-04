@@ -86,6 +86,7 @@ void GameObject::AttachChild(GameObject* child)
 	children.push_back(child);
 	child->transform->NewAttachment();
 	child->PropagateTransform();
+	App->scene->gameObjectList.push_back(child);
 }
 
 void GameObject::RemoveChild(GameObject* child)

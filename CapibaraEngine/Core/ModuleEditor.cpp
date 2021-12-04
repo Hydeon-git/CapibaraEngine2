@@ -107,7 +107,13 @@ update_status ModuleEditor::Update(float dt)
     }
 
     if (gameobjectSelected != nullptr && App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN)
-        gameobjectSelected->parent->RemoveChild(gameobjectSelected);
+    {
+        if (gameobjectSelected != App->scene->root)
+        {
+            App->scene->CleanUpSelectedGameObject(gameobjectSelected);
+            gameobjectSelected = nullptr;
+        }
+    }
 
     //Update status of each window and shows ImGui elements
     UpdateWindowStatus();
@@ -519,17 +525,39 @@ void ModuleEditor::UpdateWindowStatus() {
 
         ImGui::Begin("Hierarchy", &showHierarchyWindow);
 
-        //Just cleaning gameObjects(not textures,buffers...)
-        /*if (ImGui::Button("Clear", { 60,20 })) 
+        if (App->scene->root->name == "Root")
         {
-            App->editor->gameobjectSelected = nullptr;
-            App->scene->CleanUp(); //Clean GameObjects 
+            if (ImGui::Button("New Empty", { 80,20 }))
+            {
+                App->scene->CreateGameObject();
+            }
+            ImGui::SameLine();
+
+            if (ImGui::Button("New Children", { 80,20 }))
+            {
+                App->scene->CreateGameObject(gameobjectSelected);
+            }
+
+            if (ImGui::Button("Clear", { 80,20 }))
+            {
+                App->scene->CleanUpSelectedGameObject(gameobjectSelected); //Clean GameObjects
+                gameobjectSelected = nullptr;
+            }
+            ImGui::SameLine();
+
+            // Just cleaning gameObjects(not textures,buffers...)
+            if (ImGui::Button("Clear All", { 80,20 }))
+            {
+                App->scene->CleanUpAllGameObjects(); //Clean GameObjects
+                gameobjectSelected = nullptr;
+            }            
         }
-        ImGui::SameLine();*/
-        if (ImGui::Button("New", { 60,20 }))
+        else
         {
-            App->scene->CreateGameObject();
+            if (ImGui::Button("Create Root", { 80,20 }))
+                App->scene->CreateRoot();
         }
+
         std::stack<GameObject*> S;
         std::stack<uint> indents;
         S.push(App->scene->root);

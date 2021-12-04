@@ -28,7 +28,7 @@ bool ModuleScene::Start()
 	root = new GameObject("Root", UUID);
 
 	//Loading house and textures since beginning
-	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
+	App->import->LoadGeometry("Assets/Models/street2.fbx");
 	//App->import->Load("Library/");
 	return ret;
 }
@@ -107,6 +107,13 @@ update_status ModuleScene::Update(float dt)
 GameObject* ModuleScene::CreateGameObject(GameObject* parent) {
 
 	GameObject* temp = new GameObject();
+
+	if (countGO > 0)
+	{
+		temp->name += std::to_string(countGO);
+	}
+	++countGO;
+
 	if (parent)
 		parent->AttachChild(temp);
 	else
@@ -121,4 +128,73 @@ GameObject* ModuleScene::CreateGameObject(const std::string name, GameObject* pa
 	else
 		root->AttachChild(temp);
 	return temp;
+}
+
+void ModuleScene::CreateRoot()
+{
+	rootList.clear();
+
+	root = new GameObject("Root", root->UUID);
+	gameObjectList.push_back(root);
+	rootList.push_back(root);
+
+	for (GameObject* child : root->children)
+	{
+		gameObjectList.push_back(child);
+	}
+}
+
+bool ModuleScene::CleanUpAllGameObjects()
+{
+	std::stack<GameObject*> S;
+	for (GameObject* child : root->children)
+	{
+		S.push(child);
+	}
+	root->children.clear();
+
+	while (!S.empty())
+	{
+		GameObject* go = S.top();
+		S.pop();
+		for (GameObject* child : go->children)
+		{
+			S.push(child);
+		}
+		go->children.clear();
+		delete go;
+	}
+
+	return true;
+}
+
+bool ModuleScene::CleanUpSelectedGameObject(GameObject* selectedGameObject)
+{
+	bool ret = true;
+
+	if (selectedGameObject)
+	{
+		if (selectedGameObject != root)
+		{
+			for (int i = 0; i < gameObjectList.size(); i++)
+			{
+				if (gameObjectList[i] == selectedGameObject && selectedGameObject->parent->name == "Root")
+				{
+					root->RemoveChild(selectedGameObject);
+					gameObjectList.erase(gameObjectList.begin() + i);
+				}
+				else
+				{
+					selectedGameObject->parent->RemoveChild(selectedGameObject);
+					gameObjectList.erase(gameObjectList.begin() + i);
+				}
+			}
+		}
+		else
+		{
+			root->~GameObject();
+		}
+	}
+
+	return ret;
 }

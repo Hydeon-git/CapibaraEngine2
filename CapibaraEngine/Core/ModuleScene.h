@@ -18,7 +18,15 @@ public:
 	GameObject* CreateGameObject(GameObject* parent = nullptr);	
 	GameObject* CreateGameObject(const std::string name, GameObject* parent = nullptr);	
 	
+	bool CleanUpAllGameObjects();
+	bool CleanUpSelectedGameObject(GameObject* selectedGameObject);
+
+	void CreateRoot();
 public:
 	
 	GameObject* root;
+	std::vector<GameObject*> gameObjectList;
+	std::vector<GameObject*> rootList;
+
+	int countGO = 0;
 };
