@@ -34,7 +34,7 @@ bool ModuleScene::Start()
 	root = new GameObject("Root", UUID);
 
 	//Loading house and textures since beginning
-	App->import->LoadGeometry("Assets/Models/street2.fbx");
+	App->import->LoadGeometry("Assets/Models/BakerHouse.fbx");
 	//App->import->Load("Library/");
 
 	//GameObject* house = MeshImporter::FbxImport("Assets/Models/BakerHouse.fbx");
@@ -109,6 +109,33 @@ update_status ModuleScene::Update(float dt)
 	}
 
 	glEnable(GL_DEPTH_TEST);
+
+	App->editor->DrawGrid();
+	App->viewportBuffer->PostUpdate(dt);
+
+	if (App->editor->cameraGame != nullptr)
+	{
+		App->editor->cameraGame->DrawCamera();
+		std::queue<GameObject*> S;
+		for (GameObject* child : root->children)
+		{
+			S.push(child);
+		}
+
+		while (!S.empty())
+		{
+			GameObject* go = S.front();
+			go->Update(dt);
+			S.pop();
+			for (GameObject* child : go->children)
+			{
+				S.push(child);
+			}
+		}
+		App->viewportBufferGame->PostUpdate(dt);
+	}
+
+	
 
 	return UPDATE_CONTINUE;
 }

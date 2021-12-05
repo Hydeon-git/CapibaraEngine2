@@ -209,15 +209,15 @@ void ModuleCamera3D::OnGui()
 {
 	if (ImGui::CollapsingHeader("Editor Camera"))
 	{
-		if (ImGui::DragFloat("Vertical fov", &verticalFOV))
+		if (ImGui::DragFloat("Vertical FOV", &verticalFOV))
 		{
 			projectionIsDirty = true;
 		}
-		if (ImGui::DragFloat("Near plane distance", &nearPlaneDistance))
+		if (ImGui::DragFloat("Near Plane Distance", &nearPlaneDistance))
 		{
 			projectionIsDirty = true;
 		}
-		if (ImGui::DragFloat("Far plane distance", &farPlaneDistance))
+		if (ImGui::DragFloat("Far Plane Distance", &farPlaneDistance))
 		{
 			projectionIsDirty = true;
 		}

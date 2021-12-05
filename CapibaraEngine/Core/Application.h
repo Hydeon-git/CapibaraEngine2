@@ -34,6 +34,7 @@ public:
 	ModuleCamera3D* camera { nullptr };
 	ModuleEditor* editor { nullptr };
 	ModuleViewportFrameBuffer* viewportBuffer { nullptr };
+	ModuleViewportFrameBuffer* viewportBufferGame { nullptr };
 	ModuleImport* import { nullptr };
 	ModuleFileSystem* fileSystem { nullptr };
 	ModuleTextures* textures { nullptr };

@@ -4,6 +4,8 @@
 #include <string.h>
 #include "Math/float3.h"
 #include "Math/float2.h"
+#include "Geometry/Frustum.h"
+#include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
 #include "par_shapes.h"
 
@@ -32,6 +34,7 @@ public:
 	float3 GetCenterPointInWorldCoords() const;
 	inline float GetSphereRadius() const { return radius; }
 
+	bool InGameCamView(Frustum* cam);
 	bool Update(float dt) override;
 	void OnGui() override;
 
@@ -64,5 +67,7 @@ private:
 
 	//Local coords AABB
 	AABB localAABB;
-	
+
+	OBB globalOBB;
+	AABB globalAABB;
 };

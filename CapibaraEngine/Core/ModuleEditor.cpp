@@ -17,6 +17,7 @@
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
+#include "ComponentCamera.h"
 
 // Tools
 #include <string>
@@ -50,6 +51,7 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     currentColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     
     gameobjectSelected = nullptr;
+    cameraGame = nullptr;
 }
 
 // Destructor
@@ -84,6 +86,9 @@ bool ModuleEditor::Start()
     ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer3D->context);
     
     CreateGridBuffer();
+
+    GameObject* newGameObject = App->scene->CreateGameObject("Camera");
+    cameraGame = new ComponentCamera(newGameObject);
 
     return ret;
 }
@@ -297,7 +302,8 @@ void ModuleEditor::About_Window() {
 
 }
 
-void ModuleEditor::UpdateText(const char* text) {
+void ModuleEditor::UpdateText(const char* text)
+{
     consoleText.appendf(text);
 }
 
@@ -331,7 +337,8 @@ void ModuleEditor::BeginDock(char* dockSpaceId, ImGuiDockNodeFlags dockFlags, Im
 {
     // DockSpace
     ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) 
+    {
         ImGuiID dock = ImGui::GetID(dockSpaceId);
         ImGui::DockSpace(dock, size, dockFlags);
     }
@@ -535,18 +542,18 @@ void ModuleEditor::UpdateWindowStatus() {
 
         if (App->scene->root->name == "Root")
         {
-            if (ImGui::Button("New Empty", { 80,20 }))
+            if (ImGui::Button("New Empty", { 100,20 }))
             {
                 App->scene->CreateGameObject();
             }
             ImGui::SameLine();
 
-            if (ImGui::Button("New Children", { 80,20 }))
+            if (ImGui::Button("New Children", { 100,20 }))
             {
                 App->scene->CreateGameObject(gameobjectSelected);
             }
 
-            if (ImGui::Button("Clear", { 80,20 }))
+            if (ImGui::Button("Clear", { 100,20 }))
             {
                 App->scene->CleanUpSelectedGameObject(gameobjectSelected); //Clean GameObjects
                 gameobjectSelected = nullptr;
@@ -554,7 +561,7 @@ void ModuleEditor::UpdateWindowStatus() {
             ImGui::SameLine();
 
             // Just cleaning gameObjects(not textures,buffers...)
-            if (ImGui::Button("Clear All", { 80,20 }))
+            if (ImGui::Button("Clear All", { 100,20 }))
             {
                 App->scene->CleanUpAllGameObjects(); //Clean GameObjects
                 gameobjectSelected = nullptr;
@@ -562,7 +569,7 @@ void ModuleEditor::UpdateWindowStatus() {
         }
         else
         {
-            if (ImGui::Button("Create Root", { 80,20 }))
+            if (ImGui::Button("Create Root", { 100,20 }))
                 App->scene->CreateRoot();
         }
 
@@ -643,6 +650,20 @@ void ModuleEditor::UpdateWindowStatus() {
 
     if (showGameWindow) {
         ImGui::Begin("Game", &showGameWindow, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar);
+        
+        if (cameraGame != nullptr)
+        {
+            ImVec2 viewportSize = ImGui::GetCurrentWindow()->Size;
+            if (viewportSize.x != lastViewportGameSize.x || viewportSize.y != lastViewportGameSize.y)
+            {
+                cameraGame->aspectRatio = viewportSize.x / viewportSize.y;
+                cameraGame->RecalculateProjection();
+            }
+
+            lastViewportGameSize = viewportSize;
+            ImGui::Image((ImTextureID)App->viewportBufferGame->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+        }
+
         ImGui::End();
     }
 

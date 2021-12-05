@@ -2,10 +2,12 @@
 #include "Module.h"
 #include "Globals.h"
 #include "ImGui/imgui.h"
+#include "ComponentCamera.h"
 
 //Forward declaration
 class GameObject;
 class ComponentTransform;
+class ComponentCamera;
 
 class ModuleEditor : public Module
 {
@@ -68,7 +70,6 @@ public:
 	ImVec4 currentColor;
 	ImGuiWindowFlags sceneWindow = 0;
 	GameObject* gameobjectSelected;
-	ImVec2 lastViewportSize;
 
 
 	char selectedFile[250];
@@ -80,4 +81,9 @@ public:
 		opened,
 		readyToClose
 	} fileDialog = closed;
+
+	ComponentCamera* cameraGame;
+
+	ImVec2 lastViewportSize;
+	ImVec2 lastViewportGameSize;
 };

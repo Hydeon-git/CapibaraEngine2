@@ -4,10 +4,12 @@
 #include "SDL/include/SDL_opengl.h"
 #include "Application.h"
 #include "ModuleRenderer3D.h"
+#include "ModuleEditor.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
 #include "GameObject.h"
 #include "ImGui/imgui.h"
+#include "MathGeoLib/include/Geometry/Plane.h"
 #include "Geometry/Sphere.h"
 #include "par_shapes.h"
 
@@ -128,6 +130,14 @@ void ComponentMesh::GenerateBounds()
 
 	radius = sphere.r;
 	centerPoint = sphere.pos;
+
+	// Generate global OBB
+	owner->globalOBB = localAABB;
+	owner->globalOBB.Transform(owner->transform->transformMatrixLocal);
+
+	// Generate global AABB
+	owner->globalAABB.SetNegativeInfinity();
+	owner->globalAABB.Enclose(owner->globalOBB);
 }
 
 void ComponentMesh::DrawNormals() const
@@ -165,57 +175,94 @@ float3 ComponentMesh::GetCenterPointInWorldCoords() const
 	return owner->transform->transformMatrix.TransformPos(centerPoint);
 }
 
+
+bool ComponentMesh::InGameCamView(Frustum* cam)
+{
+	float3 OBBCorners[8];
+	Plane frustum[6];
+	int totalIn = 0;
+
+	cam->GetPlanes(frustum);
+	owner->globalAABB.GetCornerPoints(OBBCorners);
+
+	for (int i = 0; i < 6; i++)
+	{
+		int count = 8;
+		int partIn = 1;
+
+		for (int b = 0; b < 8; b++)
+		{
+			if (frustum[i].IsOnPositiveSide(OBBCorners[b]))
+			{
+				partIn = 0;
+				--count;
+			}
+
+			if (count <= 0) return false;
+
+			totalIn += partIn;
+		}
+	}
+
+	if (totalIn >= 6) return true;
+
+	return true;
+}
+
 bool ComponentMesh::Update(float dt)
 {
-
-	drawWireframe || App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	//--Enable States--//
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	if (this->textureBufferId)
+	if (InGameCamView(&App->editor->cameraGame->cameraFrustum))
 	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glBindBuffer(GL_ARRAY_BUFFER, this->textureBufferId);
-		glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+		drawWireframe || App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		//--Enable States--//
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		if (this->textureBufferId)
+		{
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glBindBuffer(GL_ARRAY_BUFFER, this->textureBufferId);
+			glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
+		glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+		if (ComponentMaterial* material = owner->GetComponent<ComponentMaterial>())
+		{
+			drawWireframe || !App->renderer3D->useTexture || App->renderer3D->wireframeMode ? 0 : glBindTexture(GL_TEXTURE_2D, material->GetTextureId());
+		}
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
+
+		//-- Draw --//
+		glPushMatrix();
+		glMultMatrixf(owner->transform->transformMatrix.Transposed().ptr());
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
+		glPopMatrix();
+		//-- UnBind Buffers--//
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		if (this->textureBufferId)
+		{
+			glBindBuffer(GL_TEXTURE_COORD_ARRAY, 0);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		}
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		//--Disables States--//
+		glDisableClientState(GL_VERTEX_ARRAY);
+
+		App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		if (drawFaceNormals || drawVertexNormals)
+			DrawNormals();
 	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-	if (ComponentMaterial* material = owner->GetComponent<ComponentMaterial>())
-	{	
-		drawWireframe || !App->renderer3D->useTexture || App->renderer3D->wireframeMode ? 0 : glBindTexture(GL_TEXTURE_2D, material->GetTextureId());
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
-
-	//-- Draw --//
-	glPushMatrix();
-	glMultMatrixf(owner->transform->transformMatrix.Transposed().ptr());
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, NULL);
-	glPopMatrix();
-	//-- UnBind Buffers--//
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	if (this->textureBufferId)
-	{
-		glBindBuffer(GL_TEXTURE_COORD_ARRAY, 0);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	}
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	//--Disables States--//
-	glDisableClientState(GL_VERTEX_ARRAY);
 	
-	App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	if (drawFaceNormals || drawVertexNormals)
-		DrawNormals();
 
 	return true;
 }
