@@ -48,8 +48,8 @@ bool ModuleImport::Init()
 	return ret;
 }
 
-update_status ModuleImport::Update(float dt)
-{
+update_status ModuleImport::Update(float dt) {
+
 	return UPDATE_CONTINUE;
 }
 
@@ -360,136 +360,19 @@ void MeshImporter::Load(const char* fileBuffer, ComponentMesh* ourMesh)
 	ourMesh->indices = *new std::vector<uint>[ourMesh->numIndices];
 	memcpy(&ourMesh->indices, cursor, bytes);
 	cursor += bytes;
+
 	// Load Vertices
 	bytes = sizeof(float3) * ourMesh->numVertices;
-	ourMesh->vertices = *new std::vector<float3>[ourMesh->numVertices * 3];
+	ourMesh->vertices = *new std::vector<float3>[ourMesh->numVertices];
 	memcpy(&ourMesh->vertices, cursor, bytes);
 	cursor += bytes;
 	// Load Normals
 	bytes = sizeof(float3) * ourMesh->numNormalFaces;
-	ourMesh->normals = *new std::vector<float3>[ourMesh->numNormalFaces * 3];
+	ourMesh->normals = *new std::vector<float3>[ourMesh->numNormalFaces];
 	memcpy(&ourMesh->normals, cursor, bytes);
 	cursor += bytes;
 
-	ourMesh->GenerateBuffers();
-	LOG("Our Mesh was loaded succesfully in %f seconds", )
-}
-GameObject* MeshImporter::FbxImport(const char* filePath)
-{
-	// Set Parent
-	GameObject* root = nullptr;
-
-	// Get path
-	std::string folder, file;
-	App->fileSystem->SplitFilePath(filePath, &folder, &file);
-	std::string path = App->fileSystem->GetPathRelativeToAssets(filePath);
-	const aiScene* scene = nullptr;
-
-
-	if (App->fileSystem->Exists(path.c_str()))
-	{
-		char* buffer = nullptr;
-		uint size = App->fileSystem->Load(path.c_str(), &buffer);
-
-		scene = aiImportFileFromMemory(buffer, size, aiProcessPreset_TargetRealtime_MaxQuality, NULL);
-
-		RELEASE_ARRAY(buffer);
-	}
-	else
-	{
-		scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
-	}
-
-	if (scene != nullptr && scene->HasMeshes())
-	{
-		aiNode* rootNode = scene->mRootNode;
-
-		root = ChildReorder(scene, rootNode, nullptr, nullptr, folder.c_str());
-		//root->SetName(file.c_str());
-
-
-
-		aiReleaseImport(scene);
-	}
-	else
-	{
-		LOG("Error loading scene %s", filePath);
-	}
-
-	return root;
-}
-GameObject* MeshImporter::ChildReorder(const aiScene* aScene, aiNode* aNode,
-	aiNode* parentNode, GameObject* parentGO, const char* path)
-{
-	GameObject* GO = new GameObject();
-
-	if (parentGO != nullptr)
-	{
-		parentGO->AttachChild(GO);
-		GO->ParentRetarget(parentGO);
-	}
-
-	// Component Mesh
-	// If there is meshes in this node
-	if (aNode->mMeshes != nullptr)
-	{
-		//GO->SetName(aNode->mName.C_Str());
-
-		
-		char* meshBuff;
-		ComponentMesh* mesh = new ComponentMesh(parentGO);
-		aiMesh* aimesh = aScene->mMeshes[*aNode->mMeshes];
-
-		Import(aimesh, mesh);
-
-		uint size = Save(mesh, &meshBuff);
-		std::string filePath = "Library/Meshes/";
-		filePath += aNode->mName.C_Str();
-		filePath += ".CapibaraMesh";
-
-		App->fileSystem->Save(filePath.c_str(), meshBuff, size);
-		delete mesh;
-		mesh = nullptr;
-		mesh = new ComponentMesh(parentGO);
-
-		Load(filePath.c_str(), mesh);
-		GO->AddComponent(mesh);
-		RELEASE_ARRAY(meshBuff);
-
-		// Component Material
-		char* textureBuff;
-		ComponentMaterial* mat = new ComponentMaterial(parentGO);
-		aiMaterial* aimaterial = aScene->mMaterials[aimesh->mMaterialIndex];
-
-		MaterialImporter::Import(aimaterial, mat, path);
-		size = MaterialImporter::Save(mat, &textureBuff);
-
-		//Set own format path
-		filePath = "Library/Textures/";
-		std::string file = App->fileSystem->GetFile((const char*)mat->GetTextureName());
-		filePath += file;
-		filePath += ".dds";
-
-		App->fileSystem->Save(filePath.c_str(), textureBuff, size);
-
-		delete mat;
-		mat = nullptr;
-		mat = new ComponentMaterial(parentGO);
-
-		MaterialImporter::Load(filePath.c_str(), mat);
-				
-		GO->AddComponent(mat);
-
-		RELEASE_ARRAY(textureBuff);		
-	}
-
-
-	for (size_t i = 0; i < aNode->mNumChildren; i++)
-	{
-		ChildReorder(aScene, aNode->mChildren[i], aNode, GO, path);
-	}
-
-	return GO;
+	LOG("Mesh was loaded succesfully in %f seconds", )
 }
 #pragma endregion
 #pragma region MaterialImporter
@@ -512,73 +395,22 @@ uint64 MaterialImporter::Save(const ComponentMaterial* ourMaterial, char** fileB
 {
 	ILuint   size;
 	ILubyte* data;
-	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5); // To pick a specific DXT compression use
+	ilSetInteger(IL_DXTC_FORMAT, IL_DXT5);// To pick a specific DXT compression use
 	size = ilSaveL(IL_DDS, nullptr, 0); // Get the size of the data buffer
 	if (size > 0) 
 	{
 		data = new ILubyte[size]; // Allocate data buffer
 		if (ilSaveL(IL_DDS, data, size) > 0) // Save to buffer with the ilSaveIL function
-		{
 			*fileBuffer = (char*)data;
-		}
+		
 		RELEASE_ARRAY(data);
 	}
 
 	return size;
 }
-void MaterialImporter::Load(const char* fileBuffer, ComponentMaterial* ourMaterial) 
+TextureObject* MaterialImporter::LoadMaterialTexture(const char* path)
 {
 	Timer timer; timer.Start();
-	ILuint imageID = 0;
-
-	ilGenImages(1, &imageID);
-	ilBindImage(imageID);
-	ilEnable(IL_ORIGIN_SET);
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-
-	char* buffer = nullptr;
-	uint size = App->fileSystem->Load(fileBuffer, &buffer);
-
-	if (ilLoadL(IL_DDS, buffer, size) == IL_FALSE)
-	{
-		buffer = nullptr;
-		ilBindImage(0);
-		ilDeleteImages(1, &imageID);
-		ilGenImages(1, &imageID);
-		ilBindImage(imageID);
-	}
-	if (buffer != NULL)
-	{
-		RELEASE_ARRAY(buffer);
-	}		
-
-	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-	ILenum error;
-	error = ilGetError();
-
-	if (error != IL_NO_ERROR)
-	{
-		ilBindImage(0);
-		ilDeleteImages(1, &imageID);
-		LOG("Error when loading %s - %d: %s", fileBuffer, error, iluErrorString(error));
-	}
-	else
-	{
-		TextureObject* texture = new TextureObject();
-
-		texture->id = (uint)(imageID);
-		texture->width = ilGetInteger(IL_IMAGE_WIDTH);
-		texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
-
-		ourMaterial->SetTexture(*texture);
-
-		LOG("Texture loaded successfully from: %s in %.3f s", fileBuffer, timer.ReadSec());
-	}
-
-	ilBindImage(0);
-}
-TextureObject* MaterialImporter::LoadMaterialTexture(const char* path)
-{	
 	ILuint imageId = 0;
 
 	std::string nPath = App->fileSystem->NormalizePath(path);
@@ -593,25 +425,18 @@ TextureObject* MaterialImporter::LoadMaterialTexture(const char* path)
 
 	if (imageId == 0)
 	{
-		LOG("Could not create a texture buffer: %s, %d", path, ilGetError());
+		LOG("Could not create a texture buffer to load: %s, %d", path, ilGetError());
 	}
 
 	ILenum file_format = IL_TYPE_UNKNOWN;
 	std::string format = App->fileSystem->GetFileFormat(path);
 
-	// Check string -> put correct format
 	if (format == ".png")
-	{
 		file_format = IL_PNG;
-	}		
 	else if (format == ".jpg")
-	{
 		file_format = IL_JPG;
-	}		
 	else if (format == ".bmp")
-	{
 		file_format = IL_BMP;
-	}		
 
 	if (App->fileSystem->Exists(relativePath.c_str()))
 	{
@@ -620,27 +445,29 @@ TextureObject* MaterialImporter::LoadMaterialTexture(const char* path)
 
 		if (ilLoadL(file_format, buffer, size) == IL_FALSE)
 		{
+			LOG("Warning: Trying to load the texture %s into buffer, %d: %s", path, ilGetError(), iluErrorString(ilGetError()));
 			buffer = nullptr;
 
+			//Reset Image
 			ilBindImage(0);
 			ilDeleteImages(1, &imageId);
 			ilGenImages(1, &imageId);
 			ilBindImage(imageId);
 		}
+
 		if (buffer != NULL)
-		{
 			RELEASE_ARRAY(buffer);
-		}			
 	}
 	else
 	{
 		if (ilLoadImage(nPath.c_str()) == IL_FALSE)
 		{
-			LOG("Error while loading a texture from %s", path);
+			LOG("Error trying to load the texture directly from %s", path);
 		}
 	}
 
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
 	ILenum error;
 	error = ilGetError();
 
@@ -652,12 +479,15 @@ TextureObject* MaterialImporter::LoadMaterialTexture(const char* path)
 	}
 	else
 	{
+		LOG("Texture loaded successfully from: %s in %.3f s", path, timer.ReadSec());
+
 		texture->id = (uint)(imageId);
 		texture->name = App->fileSystem->GetFile(path) + format;
 		texture->width = ilGetInteger(IL_IMAGE_WIDTH);
 		texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
 	}
 	ilBindImage(0);
+
 	return texture;
 }
 #pragma endregion

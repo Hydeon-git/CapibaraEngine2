@@ -3,10 +3,9 @@
 // -- Tools
 #include "Module.h"
 #include "Globals.h"
+#include "ModuleImport.h"
 
-class GameObject;
-
-
+#include "GameObject.h"
 class ModuleScene : public Module
 {
 public:

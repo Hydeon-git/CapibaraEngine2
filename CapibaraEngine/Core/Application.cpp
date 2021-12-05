@@ -5,7 +5,6 @@
 #include "MathGeoLib/include/MathBuildConfig.h"
 #include "ModuleWindow.h"
 #include "ModuleInput.h"
-#include "ModuleImport.h"
 #include "ModuleScene.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleCamera3D.h"
@@ -17,7 +16,7 @@
 
 
 
-Application::Application(): saveAction(false)
+Application::Application()
 {
 	PERF_START(ptimer);
 	window = new ModuleWindow(this);
@@ -48,10 +47,10 @@ Application::Application(): saveAction(false)
 	AddModule(scene);
 	AddModule(editor);
 
-	// Renderer
+	// Renderer last!
 	AddModule(renderer3D);
 
-	// Control variable to close App
+	//Control variable to close App
 	closeEngine = false;
 	vsync = false;
 	fps = 0.0f;
@@ -62,12 +61,12 @@ Application::Application(): saveAction(false)
 
 Application::~Application()
 {
-	for (uint i = modules.size(); i <= 0; i--)
-	{
-		RELEASE(modules[i]);
-	}
 
+	for(uint i = modules.size(); i <= 0 ; i--)
+		RELEASE(modules[i]);
+	
 	modules.clear();
+
 }
 
 bool Application::Init()
@@ -198,6 +197,8 @@ update_status Application::Update()
 	return ret;
 }
 
+
+
 bool Application::CleanUp()
 {
 	bool ret = true;
@@ -231,11 +232,6 @@ void Application::SaveEngineConfig()
 	{
 		LOG("Engine configuration not saved.");
 	}
-}
-
-void Application::Save()
-{
-	saveAction = true;
 }
 
 void Application::AddModule(Module* mod)

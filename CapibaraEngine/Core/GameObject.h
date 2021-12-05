@@ -36,8 +36,6 @@ public:
 		return component;
 	}
 
-	void SetName(const char* newName);
-	void ParentRetarget(GameObject* newParent);	
 	void DeleteComponent(Component* component);
 	void AddComponent(Component* component);
 	void AttachChild(GameObject* child);
@@ -49,11 +47,10 @@ public:
 	ComponentTransform* transform = nullptr;
 	std::vector<GameObject*> children;
 	std::vector<Component*> components;
-	int UUID;
-
+	
 	bool active = true;
 	bool isSelected = false;
 
-	
+	int UUID;
 };
 
