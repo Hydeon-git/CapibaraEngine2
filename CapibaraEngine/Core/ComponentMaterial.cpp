@@ -1,7 +1,6 @@
 #include "Application.h"
 #include "ModuleTextures.h"
 #include "ImGui/imgui.h"
-#include "ComponentMesh.h"
 #include "ComponentMaterial.h"
 
 ComponentMaterial::ComponentMaterial(GameObject* parent) : Component(parent) {}

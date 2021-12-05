@@ -26,7 +26,6 @@ class Application
 {
 public:
 
-	// Modules
 	ModuleWindow* window { nullptr };
 	ModuleInput* input { nullptr };
 	ModuleScene* scene { nullptr };
@@ -49,7 +48,6 @@ public:
 
 
 	void SaveEngineConfig();
-	void Save();
 
 	void DrawFPSDiagram();
 	void DrawHardwareConsole();
@@ -63,7 +61,8 @@ public:
 
 	void OnGui();
 
-	// FPS core
+
+	//Fps core
 	float				fps;
 	float				dt;
 	int					cap;
@@ -83,10 +82,12 @@ public:
 	//Engine configuration
 	bool closeEngine;
 	bool vsync;
-	bool saveAction;
+
+
 
 private: 
 	std::vector<Module*> modules;
+
 };
 
 extern Application* App;

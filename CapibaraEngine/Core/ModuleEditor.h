@@ -1,8 +1,10 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+
 #include "ImGui/imgui.h"
 #include "ComponentCamera.h"
+#include <string>
 
 //Forward declaration
 class GameObject;
@@ -11,6 +13,7 @@ class ComponentCamera;
 
 class ModuleEditor : public Module
 {
+
 	struct Grid
 	{
 		uint VAO;
@@ -35,23 +38,19 @@ public:
 	void CreateGridBuffer();
 	void DrawGrid();
 
-	// Docking Helper functions
+	//Docking Helper functions
 	bool DockingRootItem(char* id, ImGuiWindowFlags winFlags);
 	void BeginDock(char* dockSpaceId, ImGuiDockNodeFlags dockFlags, ImVec2 size = { .0f, .0f });
 
-	// Core Update functions to show and manage windows
+	//Core Update functions to show and manage windows
 	void MenuBar();
 	void UpdateWindowStatus();
 
-	// Console Text Pushback
+	//Console Text Pushback
 	void UpdateText(const char* consoleText);
 
-	void About_Window();	// Can be done better----?????????????????????????
+	void About_Window();	//Can be done better
 	void InspectorGameObject();
-
-	// Load a File
-	void LoadFile(const char* filterExtension, const char* fromDir);
-	void DrawDirectoryRecursive(const char* directory, const char* filterExtension);
 
 	//Window status control
 	bool showDemoWindow;
@@ -67,13 +66,12 @@ public:
 	bool showAssetsWindow;
 
 	ImGuiTextBuffer consoleText;
+
 	ImVec4 currentColor;
+
 	ImGuiWindowFlags sceneWindow = 0;
+
 	GameObject* gameobjectSelected;
-
-
-	char selectedFile[250];
-	bool in_modal = false;
 
 	enum
 	{

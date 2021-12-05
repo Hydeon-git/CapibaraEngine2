@@ -65,17 +65,6 @@ void GameObject::OnGui()
 	}
 }
 
-void GameObject::SetName(const char* newName)
-{
-	LOG("GameObject '%s' is renamed to '%s'", name, newName);
-	name = newName;
-}
-
-void GameObject::ParentRetarget(GameObject* newParent)
-{
-	parent = newParent;
-}
-
 void GameObject::DeleteComponent(Component* component) {
 
 	auto componentIt = std::find(components.begin(), components.end(), component);
