@@ -1,33 +1,39 @@
 #include "Globals.h"
 
-//Modules
+// Modules
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "ModuleWindow.h"
 #include "ModuleRenderer3D.h"
 #include "ModuleInput.h"
+#include "ModuleFileSystem.h"
 #include "ModuleImport.h"
 #include "ModuleScene.h"
 #include "ModuleViewportFrameBuffer.h"
 #include "ModuleCamera3D.h"
 #include "ModuleTextures.h"
+
+// Components
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 
-//Tools
-
+// Tools
 #include <string>
 #include <stack>
-#include "ImGui/imgui_impl_opengl3.h"
-#include "ImGui/imgui_impl_sdl.h"
-#include "ImGui/imgui_internal.h"
+#include <algorithm>
+#include <stdio.h>
 #include "glew.h"
 #include <gl/GL.h>
 
+// ImGui Library
+#include "ImGui/imgui_impl_opengl3.h"
+#include "ImGui/imgui_impl_sdl.h"
+#include "ImGui/imgui_internal.h"
+ 
+
 ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, start_enabled)
-{
-   
+{   
     showDemoWindow = false;
     showAnotherWindow = false;
     showAboutWindow = false;
@@ -46,11 +52,8 @@ ModuleEditor::ModuleEditor(Application* app, bool start_enabled) : Module(app, s
     gameobjectSelected = nullptr;
 }
 
-
 // Destructor
-ModuleEditor::~ModuleEditor()
-{
-}
+ModuleEditor::~ModuleEditor() {}
 
 bool ModuleEditor::Init() {
     bool ret = true;
@@ -343,7 +346,12 @@ void ModuleEditor::MenuBar() {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Save", "Ctrl + S")) //DO SOMETHING
             {
-
+                App->Save();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Load", "(Alt+F4)")) 
+            {
+                fileDialog = opened;
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "(Alt+F4)")) App->closeEngine = true;
@@ -664,4 +672,82 @@ void ModuleEditor::InspectorGameObject()
 ModuleEditor::Grid::~Grid()
 {
     glDeleteBuffers(1, &VAO);
+}
+
+void ModuleEditor::LoadFile(const char* filterExtension, const char* fromDir)
+{
+    ImGui::OpenPopup("Load File");
+    if (ImGui::BeginPopupModal("Load File", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        in_modal = true;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+        ImGui::BeginChild("File Browser", ImVec2(0, 300), true);
+        DrawDirectoryRecursive(fromDir, filterExtension);
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+
+        ImGui::PushItemWidth(250.f);
+        if (ImGui::InputText("##file_selector", selectedFile, 250, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+            fileDialog = readyToClose;
+
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+        if (ImGui::Button("Ok", ImVec2(50, 20)))
+            fileDialog = readyToClose;
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel", ImVec2(50, 20)))
+        {
+            fileDialog = readyToClose;
+            selectedFile[0] = '\0';
+        }
+        ImGui::EndPopup();
+    }
+    else
+    {
+        in_modal = false;
+    }
+}
+void ModuleEditor::DrawDirectoryRecursive(const char* directory, const char* filterExtension)
+{
+    std::vector<std::string> files, dirs;
+
+    std::string dir((directory) ? directory : "");
+    dir += "/";
+
+    App->fileSystem->DiscoverFiles(dir.c_str(), files, dirs);
+
+    for (std::vector<std::string>::const_iterator it = dirs.begin(); it != dirs.end(); ++it)
+    {
+        if (ImGui::TreeNodeEx((dir + (*it)).c_str(), 0, "%s/", (*it).c_str()))
+        {
+            DrawDirectoryRecursive((dir + (*it)).c_str(), filterExtension);
+            ImGui::TreePop();
+        }
+    }
+
+    std::sort(files.begin(), files.end());
+
+    for (std::vector<std::string>::const_iterator it = files.begin(); it != files.end(); ++it)
+    {
+        const std::string& str = *it;
+
+        bool ok = true;
+
+        if (filterExtension && str.substr(str.find_last_of(".") + 1) != filterExtension)
+            ok = false;
+
+        if (ok && ImGui::TreeNodeEx(str.c_str(), ImGuiTreeNodeFlags_Leaf))
+        {
+            if (ImGui::IsItemClicked()) 
+            {
+                sprintf_s(selectedFile, 250, "%s%s", dir.c_str(), str.c_str());
+
+                if (ImGui::IsMouseDoubleClicked(0))
+                    fileDialog = readyToClose;
+            }
+            ImGui::TreePop();
+        }
+    }
 }

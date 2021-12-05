@@ -7,11 +7,17 @@
 #include "ModuleTextures.h"
 #include "ModuleCamera3D.h"
 #include "ModuleEditor.h"
+#include "ModuleImport.h"
+
+#include "GameObject.h"
 #include "Component.h"
 #include "ComponentTransform.h"
+
 #include "Algorithm/Random/LCG.h"
 #include <stack>
 #include <queue>
+
+namespace MeshImporter {}
 
 ModuleScene::ModuleScene(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -30,6 +36,9 @@ bool ModuleScene::Start()
 	//Loading house and textures since beginning
 	App->import->LoadGeometry("Assets/Models/street2.fbx");
 	//App->import->Load("Library/");
+
+	//GameObject* house = MeshImporter::FbxImport("Assets/Models/BakerHouse.fbx");
+	//CreateGameObject(house);
 	return ret;
 }
 
