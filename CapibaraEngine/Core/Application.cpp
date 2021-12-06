@@ -26,6 +26,7 @@ Application::Application()
 	camera = new ModuleCamera3D(this);
 	editor = new ModuleEditor(this);
 	viewportBuffer = new ModuleViewportFrameBuffer(this);
+	viewportBufferGame = new ModuleViewportFrameBuffer(this);
 	import = new ModuleImport(this);
 	fileSystem = new ModuleFileSystem(this);
 	textures = new ModuleTextures(this);
@@ -43,6 +44,7 @@ Application::Application()
 	AddModule(import);
 	
 	// Scenes
+	AddModule(viewportBufferGame);
 	AddModule(viewportBuffer);
 	AddModule(scene);
 	AddModule(editor);
@@ -237,6 +239,11 @@ void Application::SaveEngineConfig()
 void Application::AddModule(Module* mod)
 {
 	modules.push_back(mod);
+}
+
+void Application::RequestBrowser(const std::string& website)
+{
+	ShellExecuteA(NULL, "open", website.c_str(), NULL, NULL, SW_SHOWNORMAL);
 }
 
 void Application::DrawFPSDiagram() {
