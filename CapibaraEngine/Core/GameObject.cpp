@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
+#include "ComponentCamera.h"
 #include "ComponentTransform.h"
 #include "ImGui/imgui.h"
 #include "Algorithm/Random/LCG.h"
@@ -118,10 +119,10 @@ void GameObject::Save(JSONWriter& writer)
 
 	// Pos 0 name
 	writer.String("name");
-	writer.String(name.c_str());
+	writer.String(name.c_str());	
 	// Pos 1 components
 	writer.String("components");
-	for (uint i = 0; i < components.size(); i++)
+	for (size_t i = 0; i < components.size(); ++i)
 	{
 		components[i]->Save(writer);
 	}
@@ -130,23 +131,28 @@ void GameObject::Save(JSONWriter& writer)
 	writer.Uint(UUID);
 	// Pos 3 parentUUID
 	writer.String("parentUUID");
-	if (parent != nullptr) writer.Uint(parent->UUID);	
+	if (parent != nullptr) writer.Uint(parent->UUID);
 	else writer.Uint(0);
 
 	// Closing first the array, then the object
 	writer.EndArray();
 	writer.EndObject();
+
+	for (size_t i = 0; i < children.size(); ++i)
+	{
+		children[i]->Save(writer);
+	}
 }
 void GameObject::Load(const JSONReader& reader)
 {
 	if (reader.HasMember("name"))
 	{
 		name = reader["name"].GetString();
-	}
+	}	
 	if (reader.HasMember("components"))
 	{
 		auto& rapidAuto = reader["components"];
-		for (uint i = 0; i < rapidAuto.MemberCount(); i++)
+		for (int i = 0; i < rapidAuto.MemberCount(); ++i)
 		{
 			Component* newComponent = nullptr;
 
@@ -157,6 +163,10 @@ void GameObject::Load(const JSONReader& reader)
 			if (rapidAuto[i].HasMember("mesh"))
 			{
 				newComponent = new ComponentMesh(0);
+			}
+			if (rapidAuto[i].HasMember("camera"))
+			{
+				newComponent = new ComponentCamera(0);
 			}
 			if (rapidAuto[i].HasMember("transform"))
 			{
@@ -176,5 +186,5 @@ void GameObject::Load(const JSONReader& reader)
 	if (reader.HasMember("parentUUID"))
 	{
 		parent->UUID = reader["parentUUID"].GetUint();
-	}
+	}	
 }

@@ -26,6 +26,7 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	AddPath("./Library/Models");
 	AddPath("./Library/Meshes");
 	AddPath("./Library/Materials");
+	AddPath("./Library/Scenes/");
 }
 
 // Destructor
