@@ -6,7 +6,6 @@
 #include "PhysFS/include/physfs.h"
 #include <fstream>
 #include <filesystem>
-#include <shlwapi.h>
 
 #include "Assimp/include/cfileio.h"
 #include "Assimp/include/types.h"
@@ -27,7 +26,6 @@ ModuleFileSystem::ModuleFileSystem(Application* app, bool start_enabled) : Modul
 	AddPath("./Library/Models");
 	AddPath("./Library/Meshes");
 	AddPath("./Library/Materials");
-	AddPath("./Settings");
 }
 
 // Destructor
@@ -137,7 +135,6 @@ void ModuleFileSystem::CreateLibraryDirectories()
 	CreateDir("Library/Models/");
 	CreateDir("Library/Meshes/");
 	CreateDir("Library/Materials/");
-	CreateDir("Settings/");
 }
 
 // Add a new zip file or folder
@@ -280,21 +277,6 @@ std::string ModuleFileSystem::GetPathRelativeToAssets(const char* originalPath) 
 	GetRealDir(originalPath, ret);
 
 	return ret;
-}
-
-std::string ModuleFileSystem::GetFile(const char* path)
-{
-	std::string file;
-	std::string file_path;
-	SplitFilePath(path, &file_path, &file);
-	return file;
-}
-
-std::string ModuleFileSystem::GetFileFormat(const char* path)
-{
-	std::string format = PathFindExtensionA(path);
-	std::transform(format.begin(), format.end(), format.begin(), [](unsigned char c) {return std::tolower(c);});
-	return format;
 }
 
 bool ModuleFileSystem::HasExtension(const char* path) const

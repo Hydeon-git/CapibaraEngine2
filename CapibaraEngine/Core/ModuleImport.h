@@ -7,7 +7,6 @@ class aiScene;
 class aiMaterial;
 class aiMesh;
 
-struct TextureObject;
 class ComponentMesh;
 class ComponentMaterial;
 class ComponentTransform;
@@ -28,18 +27,16 @@ public:
 	void Load(std::string path);
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
-
 };
 
 namespace MeshImporter
 {
-	void Import(const aiMesh* assimpMesh, ComponentMesh* ourMesh);
-	uint64 Save(const ComponentMesh* ourMesh, char** fileBuffer);
-	void Load(const char* fileBuffer, ComponentMesh* ourMesh);
-}
-namespace MaterialImporter
-{
-	void Import(const aiMaterial* material, ComponentMaterial* ourMaterial, const char* path);
-	uint64 Save(const ComponentMaterial* ourMaterial, char** fileBuffer);
-	TextureObject* LoadMaterialTexture(const char* path);
+	//void Import(const aiMesh* assimpMesh, ComponentMesh* ourMesh);
+	//uint64 Save(const ComponentMesh* ourMesh, char** fileBuffer);
+	//void Load(const char* fileBuffer, ComponentMesh* ourMesh);
+	
+	
+	/*GameObject* ImportFBX(const char* path);
+	GameObject* PreorderChildren(const aiScene* scene, aiNode* node, aiNode* parentNode, GameObject* parentGO, const char* path);
+	void LoadTransform(aiNode* node, ComponentTransform* transform);*/
 }

@@ -41,8 +41,6 @@ public:
 	void GetAllFilesWithExtension(const char* directory, const char* extension, std::vector<std::string>& file_list) const;
 	void GetRealDir(std::string path, std::string& output) const;
 	std::string GetPathRelativeToAssets(const char* originalPath) const;
-	std::string GetFile(const char* path);
-	std::string GetFileFormat(const char* path);
 	
 	bool Read(const std::string& path, void* data, unsigned size) const; //reads from path and allocates in data. NOTE: The caller should be responsible to clean it
 	bool Exists(const std::string& path) const;
@@ -65,7 +63,9 @@ public:
 	unsigned int Save(const char* file, const void* buffer, unsigned int size, bool append = false) const;
 
 	std::string GetUniqueName(const char* path, const char* name) const;
+
 	std::string SetNormalName(const char* path);
+
 	std::string systemBasePath;
 };
 
