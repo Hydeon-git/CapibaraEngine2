@@ -8,22 +8,21 @@ Capibara Engine is a project developed in the subject 3D Motors for the Game Des
 This project was forked from https://github.com/solidajenjo/Engine3D
 
 ## Instructions
+### Transformation and Game Object hierarchy
+- Hierarchy: User can delete, reparent, create empty and create children.
+- Transform: User can translate, rotate and scale Game Objects.
+- Mesh: User can select or drop any imported mesh.
+- Texture: User can select or drop any imported texture.
+
+### Game viewport & editor viewport
+- The editor has 2 windows: one with the scene (editor view) and another captured from a Game Object with a Camera component (game view).
+- Each window has its own framebuffer and the user can visualize both at the same time.
+
+### Scene serialization
+- Scene can be serialized to a file that can be saved.
+- 'Street Environment' is automatically loaded at the start.
+
 ### Camera
-- While Right clicking, WASD to move around the scene.
-- Mouse wheel for zoom in and zoom out.
-- Holding SHIFT duplicates movement speed.
-
-### Editor Windows
-- Console: The console LOGS the geometry loading process.
-- Configuration:
-  - A graph for the frames per second.  
-  - Configuration for all variables on each module (renderer, window, input, textures).
-  - Information output of memory consumption, hardware detection and software versions (SDL, OpenGL, DevIL).
-- Exit option in general menu to exit the engine.
-
-### Models and .fbx Import
-- Basic Shape primitives: Cube, Pyramid and Sphere.
-- Drag & Drop functionallity.
-- .fbx Objects can be loaded and be visible in the engine.
-- 3 different .fbx models included in the engine (/Assets folder).
-- BakerHouse is automatically loaded at the start.
+- Component: Camera is a component with settings that can be modified. Its boundaries can be visualized in the editor.
+- Frustum culling: All meshes use a bounding volume (AABB or OBB) and can be discarded using Frustum Culling.
+- Mouse pick: Game Objects can be picked from the world using the mouse.
