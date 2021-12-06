@@ -1,7 +1,9 @@
 #include "ComponentTransform.h"
+#include "ComponentMesh.h"
 #include "GameObject.h"
 #include "Application.h"
 #include "ModuleScene.h"
+#include "Math/TransformOps.h"
 #include "glew.h"
 #include "ImGui/imgui.h"
 
@@ -20,6 +22,9 @@ bool ComponentTransform::Update(float dt) {
 	if (isDirty)
 	{
 		transformMatrixLocal = float4x4::FromTRS(position, rotation, scale);
+		right = transformMatrixLocal.Col3(0).Normalized();
+		up = transformMatrixLocal.Col3(1).Normalized();
+		front = transformMatrixLocal.Col3(2).Normalized();
 		RecomputeGlobalMatrix();
 		owner->PropagateTransform();
 		isDirty = false;
@@ -63,7 +68,8 @@ void ComponentTransform::SetPosition(const float3& newPosition)
 
 void ComponentTransform::SetRotation(const float3& newRotation)
 {
-	rotation = Quat::FromEulerXYZ(newRotation.x, newRotation.y, newRotation.z);
+	Quat rotationDelta = Quat::FromEulerXYZ(newRotation.x - rotationEuler.x, newRotation.y - rotationEuler.y, newRotation.z - rotationEuler.z);
+	rotation = rotation * rotationDelta;
 	rotationEuler = newRotation;
 	isDirty = true;
 }
@@ -98,5 +104,71 @@ void ComponentTransform::RecomputeGlobalMatrix()
 	else
 	{
 		transformMatrix = transformMatrixLocal;
+	}
+	if (owner->GetComponent<ComponentMesh>() != nullptr)
+		owner->GetComponent<ComponentMesh>()->GenerateBounds();
+}
+
+void ComponentTransform::Save(JSONWriter& writer)
+{
+	// Object material
+	writer.StartObject();
+	writer.String("transform");
+	writer.StartArray();
+
+	// Pos 1 obj position
+	writer.StartObject();
+	writer.String("position");
+	writer.StartArray();
+	writer.Double(position.x);
+	writer.Double(position.y);
+	writer.Double(position.z);
+	writer.EndArray();
+	writer.EndObject();
+	// Pos 2 obj rotation
+	writer.StartObject();
+	writer.String("rotation");
+	writer.StartArray();
+	writer.Double(rotation.x);
+	writer.Double(rotation.y);
+	writer.Double(rotation.z);
+	writer.EndArray();
+	writer.EndObject();
+	// Pos 3 obj scale
+	writer.StartObject();
+	writer.String("scale");
+	writer.StartArray();
+	writer.Double(scale.x);
+	writer.Double(scale.y);
+	writer.Double(scale.z);
+	writer.EndArray();
+	writer.EndObject();
+
+	// Closing first the array, then the object
+	writer.EndArray();
+	writer.EndObject();
+}
+void ComponentTransform::Load(const JSONReader& reader)
+{	
+	if (reader.HasMember("position"))
+	{
+		auto& rapidAuto = reader["position"].GetArray();
+		position.x = rapidAuto[0].GetFloat();
+		position.y = rapidAuto[1].GetFloat();
+		position.z = rapidAuto[2].GetFloat();
+	}
+	if (reader.HasMember("rotation"))
+	{
+		auto& rapidAuto = reader["rotation"].GetArray();
+		rotation.x = rapidAuto[0].GetFloat();
+		rotation.y = rapidAuto[1].GetFloat();
+		rotation.z = rapidAuto[2].GetFloat();
+	}
+	if (reader.HasMember("scale"))
+	{
+		auto& rapidAuto = reader["scale"].GetArray();
+		rotation.x = rapidAuto[0].GetFloat();
+		rotation.y = rapidAuto[1].GetFloat();
+		rotation.z = rapidAuto[2].GetFloat();
 	}
 }

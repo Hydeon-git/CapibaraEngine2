@@ -3,11 +3,13 @@
 #include "Globals.h"
 
 #include "ImGui/imgui.h"
+#include "ComponentCamera.h"
 #include <string>
 
 //Forward declaration
 class GameObject;
 class ComponentTransform;
+class ComponentCamera;
 
 class ModuleEditor : public Module
 {
@@ -59,8 +61,9 @@ public:
 	bool showHierarchyWindow;
 	bool showSceneWindow;
 	bool showGameWindow;
-	bool showTextures;
+	bool showTexturesWindow;
 	bool showConsoleWindow;
+	bool showAssetsWindow;
 
 	ImGuiTextBuffer consoleText;
 
@@ -70,6 +73,15 @@ public:
 
 	GameObject* gameobjectSelected;
 
-	ImVec2 lastViewportSize;
+	enum
+	{
+		closed,
+		opened,
+		readyToClose
+	} fileDialog = closed;
 
+	ComponentCamera* cameraGame;
+
+	ImVec2 lastViewportSize;
+	ImVec2 lastViewportGameSize;
 };

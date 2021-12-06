@@ -4,18 +4,20 @@
 #include <string.h>
 #include "Math/float3.h"
 #include "Math/float2.h"
+#include "Geometry/Frustum.h"
+#include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
 #include "par_shapes.h"
 
-class ComponentMesh : public Component {
-
-public:
-	
+class ComponentMesh : public Component 
+{
+public:	
 	enum class Shape
 	{
 		CUBE,
 		SPHERE,
-		CYLINDER
+		CYLINDER,
+		PLANE
 	};
 
 	ComponentMesh(GameObject* parent);
@@ -30,9 +32,16 @@ public:
 	void DrawNormals() const;
 	float3 GetCenterPointInWorldCoords() const;
 	inline float GetSphereRadius() const { return radius; }
+	inline AABB GetAABB() { return localAABB; }
 
+	void DrawBoundingBox(float3* points, float3 color) const;
+	bool GameCamera(Frustum* cam);
 	bool Update(float dt) override;
 	void OnGui() override;
+
+	// Scene Serialization
+	void Save(JSONWriter& writer) override;
+	void Load(const JSONReader& reader) override;
 
 	uint vertexBufferId = 0, indexBufferId = 0, textureBufferId = 0;
 	std::string texturePath;
@@ -63,5 +72,7 @@ private:
 
 	//Local coords AABB
 	AABB localAABB;
-	
+
+	bool drawAABB = true;
+	bool drawOBB = false;
 };

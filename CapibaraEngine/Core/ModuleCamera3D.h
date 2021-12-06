@@ -4,6 +4,9 @@
 #include "Math/float3.h"
 #include "Math/float4x4.h"
 #include "Geometry/Frustum.h"
+#include "Geometry/LineSegment.h"
+#include "Geometry/Triangle.h"
+#include <map>
 
 class ModuleCamera3D : public Module
 {
@@ -14,6 +17,9 @@ public:
 	bool Start() override;
 	update_status Update(float dt)override;
 	bool CleanUp() override;
+
+	void MousePicking();
+	void RayIntersectionTest(LineSegment ray);
 
 	void LookAt(const float3&point);
 	void CalculateViewMatrix();

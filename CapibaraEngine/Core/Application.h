@@ -2,6 +2,7 @@
 #define _APPLICATION_
 
 #include <vector>
+#include <string>
 
 #include "Globals.h"
 #include "Timer.h"
@@ -32,6 +33,7 @@ public:
 	ModuleCamera3D* camera { nullptr };
 	ModuleEditor* editor { nullptr };
 	ModuleViewportFrameBuffer* viewportBuffer { nullptr };
+	ModuleViewportFrameBuffer* viewportBufferGame { nullptr };
 	ModuleImport* import { nullptr };
 	ModuleFileSystem* fileSystem { nullptr };
 	ModuleTextures* textures { nullptr };
@@ -54,6 +56,8 @@ public:
 	void AddModule(Module* mod);
 	void PrepareUpdate();
 	void FinishUpdate();
+
+	void RequestBrowser(const std::string& website);
 
 	void OnGui();
 

@@ -2,16 +2,24 @@
 
 #include <vector>
 #include <string>
+#include "Geometry/OBB.h"
+#include "Geometry/AABB.h"
+
+#include "rapidjson-1.1.0/include/rapidjson/prettywriter.h"
+#include "rapidjson-1.1.0/include/rapidjson/document.h"
 
 class Component;
 class ComponentTransform;
 
-class GameObject {
+typedef rapidjson::PrettyWriter<rapidjson::StringBuffer> JSONWriter;
+typedef rapidjson::Value JSONReader;
 
+class GameObject 
+{
 public:
 
 	GameObject();
-	GameObject(const std::string name);
+	GameObject(const std::string name, const int UUID);
 
 	~GameObject();
 
@@ -42,6 +50,10 @@ public:
 	void RemoveChild(GameObject* child);
 	void PropagateTransform();
 
+	// Scene Serialization
+	void Save(JSONWriter& writer);
+	void Load(const JSONReader& reader);
+
 	std::string name;
 	GameObject* parent = nullptr;
 	ComponentTransform* transform = nullptr;
@@ -51,5 +63,9 @@ public:
 	bool active = true;
 	bool isSelected = false;
 
+	OBB globalOBB;
+	AABB globalAABB;
+
+	int UUID;
 };
 
