@@ -104,7 +104,6 @@ update_status ModuleScene::Update(float dt)
 
 	App->editor->DrawGrid();
 	App->viewportBuffer->PostUpdate(dt);
-
 	if (App->editor->cameraGame != nullptr)
 	{
 		App->editor->cameraGame->DrawCamera();

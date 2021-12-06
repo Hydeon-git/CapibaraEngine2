@@ -90,6 +90,20 @@ void ComponentCamera::DrawCamera()
 	glLoadMatrixf(viewMatrix.Transposed().ptr());
 }
 
+void ComponentCamera::DrawCameraBoundaries()
+{
+	static float3 cornerPoints[8];
+	cameraFrustum.GetCornerPoints(cornerPoints);
+
+	int frustumPoints[FRUSTUM_MAX_POINTS] = FRUSTUM_POINTS;
+
+	glBegin(GL_LINES);
+	for (uint i = 0; i < FRUSTUM_MAX_POINTS; ++i)
+		glVertex3fv(&cornerPoints[frustumPoints[i]].x);
+
+	glEnd();
+}
+
 void ComponentCamera::Save(JSONWriter& writer)
 {
 	// Object camera

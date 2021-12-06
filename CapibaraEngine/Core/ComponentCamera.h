@@ -8,6 +8,9 @@
 #include "ModuleViewportFrameBuffer.h"
 #include "ImGui/imgui.h"
 
+#define FRUSTUM_POINTS { 0,2, 2,6, 6,4, 4,0, 0,1, 1,3, 3,2, 3,7, 7,5, 5,1, 6,7, 5,4 }
+#define FRUSTUM_MAX_POINTS 24
+
 class ComponentCamera : public Component
 {
 public:
@@ -19,6 +22,7 @@ public:
 	void RecalculateProjection();
 	void OnGui() override;
 	void DrawCamera();
+	void DrawCameraBoundaries();
 
 	// Scene Serialization
 	void Save(JSONWriter& writer) override;
@@ -31,6 +35,6 @@ public:
 	float aspectRatio = 1.f;
 	float verticalFOV = 100.f;
 	float nearPlaneDistance = 0.1f;
-	float farPlaneDistance = 1000.f;
+	float farPlaneDistance = 250.f;
 	bool projectionIsDirty = false;
 };

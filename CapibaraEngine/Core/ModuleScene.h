@@ -26,7 +26,6 @@ public:
 	void Load(const char* destinationPath);
 
 public:
-	
 	GameObject* root;
 	std::vector<GameObject*> gameObjectList;
 	std::vector<GameObject*> rootList;
