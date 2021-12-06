@@ -3,6 +3,7 @@
 #include "ModuleCamera3D.h"
 #include "ModuleInput.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "GameObject.h"
@@ -169,6 +170,77 @@ update_status ModuleCamera3D::Update(float dt)
 
 
 // -----------------------------------------------------------------
+void ModuleCamera3D::MousePicking()
+{
+	ImVec2 normal;
+
+	ImVec2 mousePosition(ImGui::GetMousePos());
+	ImVec2 windowPosition(ImGui::GetWindowPos());
+	ImVec2 windowSize(ImGui::GetWindowSize());
+
+	float frameHeight = ImGui::GetFrameHeight();
+
+	normal.x = (((mousePosition.x - windowPosition.x) / ((windowPosition.x + windowSize.x) - windowPosition.x)) - 0.5f) / 0.5f;
+	normal.y = -((((mousePosition.y - (windowPosition.y + frameHeight)) / (((windowPosition.y + frameHeight) + (windowSize.y - frameHeight)) - (windowPosition.y + frameHeight))) - 0.5f) / 0.5f);
+
+	if ((normal.x >= -1 && normal.x <= 1) && (normal.y >= -1 && normal.y <= 1))
+	{
+		LineSegment picking = cameraFrustum.UnProjectLineSegment(normal.x, normal.y);
+		RayIntersectionTest(picking);
+	}
+}
+
+// -----------------------------------------------------------------
+void ModuleCamera3D::RayIntersectionTest(LineSegment ray)
+{
+	std::map<float, GameObject*> selectedList;
+	float hit, firstHit;
+
+	for (std::vector<GameObject*>::iterator i = App->scene->root->children.begin(); i != App->scene->root->children.end(); ++i)
+	{
+		if ((*i)->name != "Camera")
+			if (ray.Intersects((*i)->globalAABB, hit, firstHit))
+				selectedList[hit] = (*i);
+	}
+	
+	std::map<float, GameObject*> distanceMap;
+
+	for (auto i = selectedList.begin(); i != selectedList.end(); ++i)
+	{
+		ComponentMesh* mesh = (*i).second->GetComponent<ComponentMesh>();
+		if (mesh)
+		{
+			ray.Transform((*i).second->transform->transformMatrix.Inverted());
+
+			if (mesh->numVertices >= 9)
+			{
+				for (int index = 0; index < mesh->numIndices; index += 3)
+				{
+					Triangle triangle(mesh->vertices[mesh->indices[index]], mesh->vertices[mesh->indices[index + 1]], mesh->vertices[mesh->indices[index + 2]]);
+					float distance = 0;
+					if (ray.Intersects(triangle, &distance, nullptr))
+						distanceMap[distance] = (*i).second;
+				}
+			}
+		}
+	}
+	selectedList.clear();
+
+	bool selected = false;
+
+	if (distanceMap.begin() != distanceMap.end())
+	{
+		App->editor->gameobjectSelected = (*distanceMap.begin()).second;
+		selected = true;
+	}
+	
+	distanceMap.clear();
+
+	if (!selected)
+		App->editor->gameobjectSelected = nullptr;
+}
+
+// -----------------------------------------------------------------
 void ModuleCamera3D::LookAt(const float3& point)
 {		
 	reference = point;
@@ -196,6 +268,7 @@ void ModuleCamera3D::CalculateViewMatrix()
 	viewMatrix = cameraFrustum.ViewMatrix();
 }
 
+// -----------------------------------------------------------------
 void ModuleCamera3D::RecalculateProjection()
 {
 	cameraFrustum.type = FrustumType::PerspectiveFrustum;
@@ -205,6 +278,7 @@ void ModuleCamera3D::RecalculateProjection()
 	cameraFrustum.horizontalFov = 2.f * atanf(tanf(cameraFrustum.verticalFov * 0.5f) * aspectRatio);
 }
 
+// -----------------------------------------------------------------
 void ModuleCamera3D::OnGui()
 {
 	if (ImGui::CollapsingHeader("Editor Camera"))
@@ -224,6 +298,7 @@ void ModuleCamera3D::OnGui()
 	}
 }
 
+// -----------------------------------------------------------------
 void ModuleCamera3D::OnSave(JSONWriter& writer) const
 {
 	writer.String("camera");	
@@ -236,6 +311,7 @@ void ModuleCamera3D::OnSave(JSONWriter& writer) const
 	writer.EndObject();
 }
 
+// -----------------------------------------------------------------
 void ModuleCamera3D::OnLoad(const JSONReader& reader)
 {
 	if (reader.HasMember("camera"))

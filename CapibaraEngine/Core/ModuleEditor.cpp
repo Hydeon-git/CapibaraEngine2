@@ -341,13 +341,16 @@ void ModuleEditor::BeginDock(char* dockSpaceId, ImGuiDockNodeFlags dockFlags, Im
     }
 }
 
-void ModuleEditor::MenuBar() {
+void ModuleEditor::MenuBar()
+{
 
     /* ---- MAIN MENU BAR DOCKED ----*/
-    if (ImGui::BeginMainMenuBar()) {
+    if (ImGui::BeginMainMenuBar())
+    {
 
         /* ---- FILE ---- */
-        if (ImGui::BeginMenu("File")) {
+        if (ImGui::BeginMenu("File"))
+        {
             if (ImGui::MenuItem("Save", "Ctrl + S")) //DO SOMETHING
             {
 
@@ -358,26 +361,33 @@ void ModuleEditor::MenuBar() {
         }
 
         /* ---- GAMEOBJECTS ---- */
-        if (ImGui::BeginMenu("GameObject")) {
+        if (ImGui::BeginMenu("GameObject"))
+        {
 
-            if (ImGui::MenuItem("Create empty GameObject")) {
+            if (ImGui::MenuItem("Create empty GameObject"))
+            {
                 App->scene->CreateGameObject();
             }
 
-            if (ImGui::BeginMenu("3D Objects")) {
-                if (ImGui::MenuItem("Cube")) {
+            if (ImGui::BeginMenu("3D Objects"))
+            {
+                if (ImGui::MenuItem("Cube"))
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Cube");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::CUBE);
                 }
-                if (ImGui::MenuItem("Sphere")) {
+                if (ImGui::MenuItem("Sphere"))
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Sphere");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::SPHERE);
                 }
-                if (ImGui::MenuItem("Cylinder")) {
+                if (ImGui::MenuItem("Cylinder"))
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Cylinder");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::CYLINDER);
                 }
-                if (ImGui::MenuItem("Plane")) {
+                if (ImGui::MenuItem("Plane"))
+                {
                     GameObject* newGameObject = App->scene->CreateGameObject("Plane");
                     ComponentMesh* newMesh = new ComponentMesh(newGameObject, ComponentMesh::Shape::PLANE);
                 }
@@ -388,37 +398,39 @@ void ModuleEditor::MenuBar() {
 
 
         /* ---- WINDOW ----*/
-        if (ImGui::BeginMenu("Window")) {
+        if (ImGui::BeginMenu("Window"))
+        {
 
             if (ImGui::MenuItem("Examples")) showDemoWindow = !showDemoWindow;
             ImGui::Separator();
 
-            if (ImGui::BeginMenu("Workspace Style")) {
-                if (ImGui::MenuItem("Dark")) 
+            if (ImGui::BeginMenu("Workspace Style"))
+            {
+                if (ImGui::MenuItem("Dark"))
                     ImGui::StyleColorsDark();
-                if (ImGui::MenuItem("Classic")) 
+                if (ImGui::MenuItem("Classic"))
                     ImGui::StyleColorsClassic();
-                if (ImGui::MenuItem("Light")) 
+                if (ImGui::MenuItem("Light"))
                     ImGui::StyleColorsLight();
-                if (ImGui::MenuItem("Custom")) 
+                if (ImGui::MenuItem("Custom"))
                     ImGui::StyleColorsCustom();
                 ImGui::EndMenu();
             }
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Hierarchy")) 
+            if (ImGui::MenuItem("Hierarchy"))
                 showHierarchyWindow = !showHierarchyWindow;
-            if (ImGui::MenuItem("Inspector")) 
+            if (ImGui::MenuItem("Inspector"))
                 showInspectorWindow = !showInspectorWindow;
-            if (ImGui::MenuItem("Scene")) 
+            if (ImGui::MenuItem("Scene"))
                 showSceneWindow = !showSceneWindow;
-            if (ImGui::MenuItem("Game")) 
+            if (ImGui::MenuItem("Game"))
                 showGameWindow = !showGameWindow;
-            if (ImGui::MenuItem("Console")) 
+            if (ImGui::MenuItem("Console"))
                 showConsoleWindow = !showConsoleWindow;
-            if (ImGui::MenuItem("Textures")) 
+            if (ImGui::MenuItem("Textures"))
                 showTexturesWindow = !showTexturesWindow;
-            if (ImGui::MenuItem("Assets")) 
+            if (ImGui::MenuItem("Assets"))
                 showAssetsWindow = !showAssetsWindow;
 
             ImGui::Separator();
@@ -430,7 +442,8 @@ void ModuleEditor::MenuBar() {
         }
 
         /* ---- HELP ----*/
-        if (ImGui::BeginMenu("Help")) {
+        if (ImGui::BeginMenu("Help"))
+        {
             if (ImGui::MenuItem("Documentation"))
                 App->RequestBrowser("https://github.com/Hydeon-git/CapibaraEngine2");
 
@@ -440,7 +453,7 @@ void ModuleEditor::MenuBar() {
             if (ImGui::MenuItem("Report a bug"))
                 App->RequestBrowser("https://github.com/Hydeon-git/CapibaraEngine2/issues");
 
-            if (ImGui::MenuItem("About")) 
+            if (ImGui::MenuItem("About"))
                 showAboutWindow = !showAboutWindow;
             ImGui::EndMenu();
         }
@@ -450,18 +463,20 @@ void ModuleEditor::MenuBar() {
     ImGui::EndMainMenuBar();
 }
 
-void ModuleEditor::UpdateWindowStatus() {
+void ModuleEditor::UpdateWindowStatus()
+{
 
     //Demo
-    if (showDemoWindow) 
+    if (showDemoWindow)
         ImGui::ShowDemoWindow(&showDemoWindow);
 
     //About info
-    if (showAboutWindow)  
+    if (showAboutWindow)
         About_Window();
 
     //Config
-    if (showConfWindow) {
+    if (showConfWindow)
+    {
 
         ImGui::Begin("Configuration", &showConfWindow);        
         App->OnGui();
@@ -495,7 +510,8 @@ void ModuleEditor::UpdateWindowStatus() {
     }
         
     //Console
-    if (showConsoleWindow) {
+    if (showConsoleWindow)
+    {
 
         ImGui::Begin("Console", &showConsoleWindow);
         ImGui::TextUnformatted(consoleText.begin(), consoleText.end());
@@ -504,7 +520,8 @@ void ModuleEditor::UpdateWindowStatus() {
     }
 
     //Inspector
-    if (showInspectorWindow) {
+    if (showInspectorWindow)
+    {
 
         ImGui::Begin("Inspector", &showInspectorWindow);
         //Only shows info if any gameobject selected
@@ -516,7 +533,8 @@ void ModuleEditor::UpdateWindowStatus() {
     }
     
     //Assets
-    if (showAssetsWindow) {
+    if (showAssetsWindow)
+    {
 
         ImGui::Begin("Assets", &showAssetsWindow);
 
@@ -527,7 +545,8 @@ void ModuleEditor::UpdateWindowStatus() {
     }
 
     //Hierarchy
-    if (showHierarchyWindow) {
+    if (showHierarchyWindow)
+    {
 
 
         ImGui::Begin("Hierarchy", &showHierarchyWindow);
@@ -640,7 +659,8 @@ void ModuleEditor::UpdateWindowStatus() {
         ImGui::End();
     }
 
-    if (showGameWindow) {
+    if (showGameWindow)
+    {
         ImGui::Begin("Game", &showGameWindow, ImGuiWindowFlags_::ImGuiWindowFlags_NoScrollbar);
         
         if (cameraGame != nullptr)
@@ -659,7 +679,8 @@ void ModuleEditor::UpdateWindowStatus() {
         ImGui::End();
     }
 
-    if (showSceneWindow) {
+    if (showSceneWindow)
+    {
 
         ImGui::Begin("Scene", &showSceneWindow, ImGuiWindowFlags_NoScrollbar);
 
@@ -671,6 +692,10 @@ void ModuleEditor::UpdateWindowStatus() {
         }
         lastViewportSize = viewportSize;
         ImGui::Image((ImTextureID)App->viewportBuffer->texture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+        
+        if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN)
+            App->camera->MousePicking();
+
         ImGui::End();
     }
     

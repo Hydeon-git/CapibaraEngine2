@@ -13,7 +13,6 @@
 #include "Geometry/Sphere.h"
 #include "par_shapes.h"
 
-
 ComponentMesh::ComponentMesh(GameObject* parent) : Component(parent) {}
 
 ComponentMesh::ComponentMesh(GameObject* parent, Shape shape) : Component(parent)
@@ -70,7 +69,8 @@ void ComponentMesh::CopyParMesh(par_shapes_mesh* parMesh)
 }
 
 
-void ComponentMesh::GenerateBuffers() {
+void ComponentMesh::GenerateBuffers()
+{
 	
 	//-- Generate Vertex
 	vertexBufferId = 0;
@@ -119,7 +119,6 @@ void ComponentMesh::ComputeNormals()
 
 void ComponentMesh::GenerateBounds()
 {
-	
 	localAABB.SetNegativeInfinity();
 	localAABB.Enclose(&vertices[0], vertices.size());
 		
@@ -131,11 +130,9 @@ void ComponentMesh::GenerateBounds()
 	radius = sphere.r;
 	centerPoint = sphere.pos;
 
-	// Generate global OBB
-	owner->globalOBB = localAABB;
+	owner->globalOBB = GetAABB();
 	owner->globalOBB.Transform(owner->transform->transformMatrixLocal);
 
-	// Generate global AABB
 	owner->globalAABB.SetNegativeInfinity();
 	owner->globalAABB.Enclose(owner->globalOBB);
 }
@@ -175,43 +172,64 @@ float3 ComponentMesh::GetCenterPointInWorldCoords() const
 	return owner->transform->transformMatrix.TransformPos(centerPoint);
 }
 
-
-bool ComponentMesh::InGameCamView(Frustum* cam)
+void ComponentMesh::DrawBoundingBox(float3* points, float3 color) const
 {
-	float3 OBBCorners[8];
-	Plane frustum[6];
-	int totalIn = 0;
+	glColor3fv(&color.x);
+	glLineWidth(2.f);
+	glBegin(GL_LINES);
 
-	cam->GetPlanes(frustum);
-	owner->globalAABB.GetCornerPoints(OBBCorners);
+	std::vector<int> ind =
+	{
+		0,2,2,6,6,4,4,0,
+		0,1,1,3,3,2,4,5,
+		6,7,5,7,3,7,1,5,
+	};
+	for (const auto& i : ind)
+	{
+		glVertex3fv(&points[i].x);
+	}
+
+	glEnd();
+	glLineWidth(1.f);
+	glColor3f(1.f, 1.f, 1.f);
+}
+
+bool ComponentMesh::GameCamera(Frustum* frustumCam)
+{
+	float3 obb[8];
+	Plane frustum[6];
+	int total = 0;
+
+	frustumCam->GetPlanes(frustum);
+	owner->globalAABB.GetCornerPoints(obb);
 
 	for (int i = 0; i < 6; i++)
 	{
 		int count = 8;
-		int partIn = 1;
+		int points = 1;
 
 		for (int b = 0; b < 8; b++)
 		{
-			if (frustum[i].IsOnPositiveSide(OBBCorners[b]))
+			if (frustum[i].IsOnPositiveSide(obb[b]))
 			{
-				partIn = 0;
+				points = 0;
 				--count;
 			}
 
 			if (count <= 0) return false;
 
-			totalIn += partIn;
+			total += points;
 		}
 	}
 
-	if (totalIn >= 6) return true;
+	if (total >= 6) return true;
 
 	return true;
 }
 
 bool ComponentMesh::Update(float dt)
 {
-	if (InGameCamView(&App->editor->cameraGame->cameraFrustum))
+	if (GameCamera(&App->editor->cameraGame->cameraFrustum))
 	{
 		drawWireframe || App->renderer3D->wireframeMode ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -261,9 +279,22 @@ bool ComponentMesh::Update(float dt)
 
 		if (drawFaceNormals || drawVertexNormals)
 			DrawNormals();
+
+		if (drawAABB)
+		{
+			float3 points[8];
+			owner->globalAABB.GetCornerPoints(points);
+			DrawBoundingBox(points, float3(1.0f, 0.5f, 0.5f));
+		}
+
+		if (drawOBB)
+		{
+			float3 points[8];
+			owner->globalOBB.GetCornerPoints(points);
+			DrawBoundingBox(points, float3(0.5f, 0.5f, 1.0f));
+		}
 	}
 	
-
 	return true;
 }
 
@@ -277,7 +308,7 @@ void ComponentMesh::OnGui()
 		ImGui::DragFloat("Normal draw scale", &normalScale);
 		ImGui::Checkbox("Draw face normals", &drawFaceNormals);
 		ImGui::Checkbox("Draw vertex normals", &drawVertexNormals);
+		ImGui::Checkbox("Draw AABB", &drawAABB);
+		ImGui::Checkbox("Draw OBB", &drawOBB);
 	}
 }
-
-

@@ -33,8 +33,10 @@ public:
 	void DrawNormals() const;
 	float3 GetCenterPointInWorldCoords() const;
 	inline float GetSphereRadius() const { return radius; }
+	inline AABB GetAABB() { return localAABB; }
 
-	bool InGameCamView(Frustum* cam);
+	void DrawBoundingBox(float3* points, float3 color) const;
+	bool GameCamera(Frustum* cam);
 	bool Update(float dt) override;
 	void OnGui() override;
 
@@ -68,6 +70,6 @@ private:
 	//Local coords AABB
 	AABB localAABB;
 
-	OBB globalOBB;
-	AABB globalAABB;
+	bool drawAABB = true;
+	bool drawOBB = false;
 };
