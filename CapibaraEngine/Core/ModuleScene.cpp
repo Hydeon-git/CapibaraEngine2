@@ -29,7 +29,7 @@ bool ModuleScene::Start()
 	root = new GameObject("Root", UUID);
 
 	//Loading house and textures since beginning
-	App->import->LoadGeometry("Assets/Models/street2.fbx");
+	App->import->LoadGeometry("Assets/Models/street.fbx");
 	//App->import->Load("Library/");
 	return ret;
 }
@@ -176,7 +176,8 @@ bool ModuleScene::CleanUpAllGameObjects()
 	std::stack<GameObject*> S;
 	for (GameObject* child : root->children)
 	{
-		S.push(child);
+		if(child->name!="Camera")
+			S.push(child);
 	}
 	root->children.clear();
 

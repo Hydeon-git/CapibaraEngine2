@@ -538,10 +538,13 @@ void ModuleEditor::UpdateWindowStatus()
     //Assets
     if (showAssetsWindow)
     {
-
         ImGui::Begin("Assets", &showAssetsWindow);
 
+        if(ImGui::TreeNodeEx("Textures"))
+            ImGui::TreePop();
 
+        if(ImGui::TreeNodeEx("Models"))
+            ImGui::TreePop();
 
         ImGui::End();
 
@@ -569,8 +572,11 @@ void ModuleEditor::UpdateWindowStatus()
 
             if (ImGui::Button("Clear", { 100,20 }))
             {
-                App->scene->CleanUpSelectedGameObject(gameobjectSelected); //Clean GameObjects
-                gameobjectSelected = nullptr;
+                if (gameobjectSelected->name != "Camera")
+                {
+                    App->scene->CleanUpSelectedGameObject(gameobjectSelected); //Clean GameObjects
+                    gameobjectSelected = nullptr;
+                }
             }
             ImGui::SameLine();
 

@@ -27,6 +27,10 @@ public:
 	void Load(std::string path);
 
 	void FindNodeName(const aiScene* scene, const size_t i, std::string& name);
+
+
+
+	std::vector<std::string> check;
 };
 
 namespace MeshImporter

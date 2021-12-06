@@ -7,6 +7,7 @@
 #include "ModuleFileSystem.h"
 #include "ModuleScene.h"
 #include "ComponentMaterial.h"
+#include "ComponentTransform.h"
 #include "ComponentMesh.h"
 #include "GameObject.h"
 
@@ -91,10 +92,12 @@ bool ModuleImport::LoadGeometry(const char* path) {
 				texture = scene->mMaterials[assimpMesh->mMaterialIndex];
 
 				if (texture != nullptr) {
-					aiGetMaterialTexture(texture, aiTextureType_DIFFUSE, assimpMesh->mMaterialIndex, &texturePath);
+					texture->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
 					std::string new_path(texturePath.C_Str());
+
+
 					if (new_path.size() > 0) {
-						mesh->texturePath = "Assets/Textures/" + new_path;
+						mesh->texturePath = "Assets/Textures/" + App->fileSystem->SetNormalName(new_path.c_str());
 						if (!App->textures->Find(mesh->texturePath))
 						{
 							const TextureObject& textureObject = App->textures->Load(mesh->texturePath);							
@@ -151,6 +154,16 @@ bool ModuleImport::LoadGeometry(const char* path) {
 				}
 			}
 			
+			float3 newRotationEuler;
+			
+			newRotationEuler.x = -90.f;
+
+			newRotationEuler.x = DEGTORAD * newRotationEuler.x;
+			newRotationEuler.y = DEGTORAD * newRotationEuler.y;
+			newRotationEuler.z = DEGTORAD * newRotationEuler.z;
+
+			newGameObject->transform->SetRotation(newRotationEuler);
+
 			mesh->GenerateBuffers();
 			mesh->GenerateBounds();
 			mesh->ComputeNormals();

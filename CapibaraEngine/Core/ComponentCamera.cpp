@@ -12,7 +12,7 @@ ComponentCamera::ComponentCamera(GameObject* parent) : Component(parent)
 	up = float3(0.0f, 1.0f, 0.0f);
 	front = float3(0.0f, 0.0f, 1.0f);
 
-	position = float3(0.0f, 5.0f, -15.0f);
+	position = float3(0.0f, 15.0f, -60.0f);
 	reference = float3(0.0f, 0.0f, 0.0f);
 
 	owner->transform->SetPosition(position);

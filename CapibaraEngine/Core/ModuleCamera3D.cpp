@@ -15,7 +15,7 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	up = float3(0.0f, 1.0f, 0.0f);
 	front = float3(0.0f, 0.0f, 1.0f);
 
-	position = float3(0.0f, 5.0f, -15.0f);
+	position = float3(0.0f, 10.0f, -40.0f);
 	reference = float3(0.0f, 0.0f, 0.0f);
 	
 	CalculateViewMatrix();
