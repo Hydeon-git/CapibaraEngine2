@@ -29,7 +29,7 @@ bool ModuleScene::Start()
 	root = new GameObject("Root", UUID);
 
 	//Loading house and textures since beginning
-	App->import->LoadGeometry("Assets/Models/street.fbx");
+	App->import->LoadGeometry("Assets/Models/StreetEnvironment.fbx");
 	//App->import->Load("Library/");
 	return ret;
 }
