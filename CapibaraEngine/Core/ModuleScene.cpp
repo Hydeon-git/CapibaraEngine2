@@ -6,6 +6,7 @@
 #include "ModuleImport.h"
 #include "ModuleTextures.h"
 #include "ModuleCamera3D.h"
+#include "ModuleFileSystem.h"
 #include "ModuleEditor.h"
 #include "Component.h"
 #include "ComponentTransform.h"
@@ -170,7 +171,6 @@ void ModuleScene::CreateRoot()
 		gameObjectList.push_back(child);
 	}
 }
-
 bool ModuleScene::CleanUpAllGameObjects()
 {
 	std::stack<GameObject*> S;
@@ -194,7 +194,6 @@ bool ModuleScene::CleanUpAllGameObjects()
 
 	return true;
 }
-
 bool ModuleScene::CleanUpSelectedGameObject(GameObject* selectedGameObject)
 {
 	bool ret = true;
@@ -224,4 +223,53 @@ bool ModuleScene::CleanUpSelectedGameObject(GameObject* selectedGameObject)
 	}
 
 	return ret;
+}
+
+void ModuleScene::Save()
+{
+	rapidjson::StringBuffer sceneBuffer;
+	JSONWriter writer(sceneBuffer);
+
+	writer.StartObject();
+	writer.String("GameObjects");
+	writer.StartArray();
+	root->Save(writer);
+	writer.EndArray();
+	writer.EndObject();
+
+	if (App->fileSystem->Save("Library/Scenes/scene.capi", sceneBuffer.GetString(), strlen(sceneBuffer.GetString()), false))
+	{
+		LOG("Capibara Scene saved on Library/Scenes succesfully!!");
+	}
+	else LOG("Capibara Scene save FAILED!");	
+}
+
+void ModuleScene::Load(const char* destinationPath)
+{
+	char* loadBuffer = nullptr;
+
+	if (App->fileSystem->Load(destinationPath, &loadBuffer))
+	{
+		rapidjson::Document document;
+		if (document.Parse<rapidjson::kParseStopWhenDoneFlag>(loadBuffer).HasParseError() == false)
+		{
+			const rapidjson::Value reader = document.GetObjectJSON();
+
+			if (reader.HasMember("GameObjects"))
+			{
+				auto& a = reader["GameObjects"];
+				if (a.IsArray())
+				{
+					for (int i = 0; i < a.MemberCount(); ++i)
+					{
+						GameObject newGO;
+						newGO.Load(reader);
+						root->AttachChild(&newGO);
+					}
+				}
+			}
+			LOG("CapibaraEngine Scene Imported Succesfully!!");
+		}
+	}
+	RELEASE_ARRAY(loadBuffer);
 }

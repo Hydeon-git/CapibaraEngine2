@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Globals.h"
 #include "ModuleTextures.h"
 #include "ImGui/imgui.h"
 #include "ComponentMaterial.h"
@@ -26,3 +27,46 @@ void ComponentMaterial::OnGui()
 	}
 }
 
+void ComponentMaterial::Save(JSONWriter& writer)
+{
+	// Object material
+	writer.StartObject();
+	writer.String("material");
+	writer.StartArray();
+
+	// Pos 0 name
+	writer.String("name");
+	writer.String(textureName.c_str());
+	// Pos 1 width
+	writer.String("width");
+	writer.Uint(width);
+	// Pos 2 height
+	writer.String("height");
+	writer.Uint(height);	
+	// Pos 3 textureId
+	writer.String("textureId");
+	writer.Uint(textureId);
+
+	// Closing first the array, then the object
+	writer.EndArray();
+	writer.EndObject();
+}
+void ComponentMaterial::Load(const JSONReader& reader)
+{
+	if (reader.HasMember("name"))
+	{
+		textureName = reader["name"].GetString();
+	}
+	if (reader.HasMember("width"))
+	{
+		width = reader["width"].GetUint();
+	}
+	if (reader.HasMember("height"))
+	{
+		height = reader["height"].GetUint();
+	}
+	if (reader.HasMember("textureId"))
+	{
+		textureId = reader["textureId"].GetUint();
+	}
+}

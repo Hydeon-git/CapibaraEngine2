@@ -31,6 +31,10 @@ public:
 
 	void RecomputeGlobalMatrix();
 	
+	// Scene Serialization
+	void Save(JSONWriter& writer) override;
+	void Load(const JSONReader& reader) override;
+
 	float4x4 transformMatrix;
 	float4x4 transformMatrixLocal;
 

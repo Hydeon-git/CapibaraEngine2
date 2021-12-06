@@ -9,10 +9,9 @@
 #include "Geometry/AABB.h"
 #include "par_shapes.h"
 
-class ComponentMesh : public Component {
-
-public:
-	
+class ComponentMesh : public Component 
+{
+public:	
 	enum class Shape
 	{
 		CUBE,
@@ -39,6 +38,10 @@ public:
 	bool GameCamera(Frustum* cam);
 	bool Update(float dt) override;
 	void OnGui() override;
+
+	// Scene Serialization
+	void Save(JSONWriter& writer) override;
+	void Load(const JSONReader& reader) override;
 
 	uint vertexBufferId = 0, indexBufferId = 0, textureBufferId = 0;
 	std::string texturePath;

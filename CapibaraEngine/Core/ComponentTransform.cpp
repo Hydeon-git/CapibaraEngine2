@@ -108,3 +108,67 @@ void ComponentTransform::RecomputeGlobalMatrix()
 	if (owner->GetComponent<ComponentMesh>() != nullptr)
 		owner->GetComponent<ComponentMesh>()->GenerateBounds();
 }
+
+void ComponentTransform::Save(JSONWriter& writer)
+{
+	// Object material
+	writer.StartObject();
+	writer.String("transform");
+	writer.StartArray();
+
+	// Pos 1 obj position
+	writer.StartObject();
+	writer.String("position");
+	writer.StartArray();
+	writer.Double(position.x);
+	writer.Double(position.y);
+	writer.Double(position.z);
+	writer.EndArray();
+	writer.EndObject();
+	// Pos 2 obj rotation
+	writer.StartObject();
+	writer.String("rotation");
+	writer.StartArray();
+	writer.Double(rotation.x);
+	writer.Double(rotation.y);
+	writer.Double(rotation.z);
+	writer.EndArray();
+	writer.EndObject();
+	// Pos 3 obj scale
+	writer.StartObject();
+	writer.String("scale");
+	writer.StartArray();
+	writer.Double(scale.x);
+	writer.Double(scale.y);
+	writer.Double(scale.z);
+	writer.EndArray();
+	writer.EndObject();
+
+	// Closing first the array, then the object
+	writer.EndArray();
+	writer.EndObject();
+}
+void ComponentTransform::Load(const JSONReader& reader)
+{	
+	if (reader.HasMember("position"))
+	{
+		auto& rapidAuto = reader["position"].GetArray();
+		position.x = rapidAuto[0].GetFloat();
+		position.y = rapidAuto[1].GetFloat();
+		position.z = rapidAuto[2].GetFloat();
+	}
+	if (reader.HasMember("rotation"))
+	{
+		auto& rapidAuto = reader["rotation"].GetArray();
+		rotation.x = rapidAuto[0].GetFloat();
+		rotation.y = rapidAuto[1].GetFloat();
+		rotation.z = rapidAuto[2].GetFloat();
+	}
+	if (reader.HasMember("scale"))
+	{
+		auto& rapidAuto = reader["scale"].GetArray();
+		rotation.x = rapidAuto[0].GetFloat();
+		rotation.y = rapidAuto[1].GetFloat();
+		rotation.z = rapidAuto[2].GetFloat();
+	}
+}

@@ -89,3 +89,48 @@ void ComponentCamera::DrawCamera()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(viewMatrix.Transposed().ptr());
 }
+
+void ComponentCamera::Save(JSONWriter& writer)
+{
+	// Object camera
+	writer.StartObject();
+	writer.String("camera");
+	writer.StartArray();
+
+	// Pos 0 aspectRatio
+	writer.String("aspectRatio");
+	writer.Double(aspectRatio);
+	// Pos 1 verticalFOV
+	writer.String("verticalFOV");
+	writer.Double(verticalFOV);
+	// Pos 2 nearPlaneDistance
+	writer.String("nearPlaneDistance");
+	writer.Double(nearPlaneDistance);
+	// Pos 3 farPlaneDistance
+	writer.String("farPlaneDistance");
+	writer.Double(farPlaneDistance);
+
+	// Closing first the array, then the object
+	writer.EndArray();
+	writer.EndObject();
+}
+
+void ComponentCamera::Load(const JSONReader& reader)
+{
+	if (reader.HasMember("aspectRatio"))
+	{
+		aspectRatio = reader["aspectRatio"].GetFloat();
+	}
+	if (reader.HasMember("verticalFOV"))
+	{
+		verticalFOV = reader["verticalFOV"].GetFloat();
+	}
+	if (reader.HasMember("nearPlaneDistance"))
+	{
+		nearPlaneDistance = reader["nearPlaneDistance"].GetFloat();
+	}
+	if (reader.HasMember("farPlaneDistance"))
+	{
+		farPlaneDistance = reader["farPlaneDistance"].GetFloat();
+	}
+}

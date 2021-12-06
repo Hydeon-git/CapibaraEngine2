@@ -312,3 +312,19 @@ void ComponentMesh::OnGui()
 		ImGui::Checkbox("Draw OBB", &drawOBB);
 	}
 }
+
+void ComponentMesh::Save(JSONWriter& writer)
+{
+	// Object material
+	writer.StartObject();
+	writer.String("mesh");
+	writer.StartArray();
+
+	// Closing first the array, then the object
+	writer.EndArray();
+	writer.EndObject();
+}
+void ComponentMesh::Load(const JSONReader& reader)
+{	
+
+}

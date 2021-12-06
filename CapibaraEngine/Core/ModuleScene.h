@@ -20,8 +20,11 @@ public:
 	
 	bool CleanUpAllGameObjects();
 	bool CleanUpSelectedGameObject(GameObject* selectedGameObject);
-
 	void CreateRoot();
+
+	void Save();
+	void Load(const char* destinationPath);
+
 public:
 	
 	GameObject* root;

@@ -135,6 +135,7 @@ void ModuleFileSystem::CreateLibraryDirectories()
 	CreateDir("Library/Models/");
 	CreateDir("Library/Meshes/");
 	CreateDir("Library/Materials/");
+	CreateDir("Library/Scenes/");
 }
 
 // Add a new zip file or folder

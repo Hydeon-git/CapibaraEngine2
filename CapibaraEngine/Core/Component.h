@@ -5,11 +5,9 @@
 #include <string>
 #include "GameObject.h"
 
-class Component {
-
+class Component 
+{
 public:
-
-
 	Component(GameObject* parent) : owner(parent)
 	{
 		if (parent)
@@ -24,6 +22,10 @@ public:
 	virtual bool Enable() { return active == true; };
 	virtual bool Disable() { return active == false; };
 	virtual void OnGui() { }
+
+	// Scene Serialization
+	virtual void Save(JSONWriter& writer) {}
+	virtual void Load(const JSONReader& reader) {}
 
 public:
 

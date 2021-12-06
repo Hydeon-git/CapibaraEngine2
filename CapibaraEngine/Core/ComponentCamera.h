@@ -20,6 +20,11 @@ public:
 	void OnGui() override;
 	void DrawCamera();
 
+	// Scene Serialization
+	void Save(JSONWriter& writer) override;
+	void Load(const JSONReader& reader) override;
+
+
 	float3 right, up, front, position, reference;
 	Frustum cameraFrustum;
 	float4x4 viewMatrix;
