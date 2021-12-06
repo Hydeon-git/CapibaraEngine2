@@ -105,17 +105,6 @@ update_status ModuleEditor::PreUpdate(float dt) {
 update_status ModuleEditor::Update(float dt)
 {
     DrawGrid();
-
-    if (ImGui::Checkbox("PLAY", &play))
-    {
-        play = true;
-        paused = false;
-    }
-    if (ImGui::Checkbox("PAUSE", &paused))
-    {
-        play = false;
-        paused = true;
-    }
     //Creating MenuBar item as a root for docking windows
     if (DockingRootItem("Viewport", ImGuiWindowFlags_MenuBar)) {
         MenuBar();
