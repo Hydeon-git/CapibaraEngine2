@@ -170,25 +170,27 @@ void Application::OnGui()
 // Call PreUpdate, Update and PostUpdate on all modules
 update_status Application::Update()
 {
-
+	
 	update_status ret = UPDATE_CONTINUE;
 	PrepareUpdate();
-	
-	for (size_t i = 0; i < modules.size() && ret== UPDATE_CONTINUE; i++)
+	if (editor->play == true) 
 	{
-		ret = modules[i]->PreUpdate(dt);
-	}
+		for (size_t i = 0; i < modules.size() && ret == UPDATE_CONTINUE; i++)
+		{
+			ret = modules[i]->PreUpdate(dt);
+		}
 
-	for (size_t i = 0; i < modules.size() && ret == UPDATE_CONTINUE; i++)
-	{
-		ret = modules[i]->Update(dt);
-	}
+		for (size_t i = 0; i < modules.size() && ret == UPDATE_CONTINUE; i++)
+		{
+			ret = modules[i]->Update(dt);
+		}
 
 
-	for (size_t i = 0; i < modules.size() && ret == UPDATE_CONTINUE; i++)
-	{
-		ret = modules[i]->PostUpdate(dt);
+		for (size_t i = 0; i < modules.size() && ret == UPDATE_CONTINUE; i++)
+		{
+			ret = modules[i]->PostUpdate(dt);
 
+		}
 	}
 
 	// If main menu bar exit button pressed changes closeEngine bool to true and closes App

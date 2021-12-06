@@ -65,9 +65,13 @@ public:
 	bool showConsoleWindow;
 	bool showAssetsWindow;
 
+	bool paused = false;
+	bool play = true;
+
 	ImGuiTextBuffer consoleText;
 
 	ImVec4 currentColor;
+	ImVec2 Pausepos;
 
 	ImGuiWindowFlags sceneWindow = 0;
 
